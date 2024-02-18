@@ -39,6 +39,14 @@ void Renderer::RenderObject(const GraphicsObject& object)
 	shader->SendMat4Uniform("world", object.GetReferenceFrame());
 	auto& buffer = object.GetVertexBuffer();
 	buffer->Select();
+
+	//Lab 4
+	if (buffer->HasTexture())
+	{
+		shader->SendIntUniform("texUnit", buffer->GetTextureUnit());
+		buffer->GetTexture()->SelectToRender(buffer->GetTextureUnit());
+	}
+
 	buffer->SetUpAttributeInterpretration();
 	glDrawArrays(buffer->GetPrimitiveType(), 0, buffer->GetNumberOfVertices());
 
