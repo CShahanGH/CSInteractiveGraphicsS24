@@ -87,7 +87,7 @@ static void SetUpTexturedScene(std::shared_ptr<Shader>& textureShader, std::shar
 	buffer->AddVertexData(8, 20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 3.0f, 3.0f);
 
 	//Add vertex attributes
-	buffer->AddVertexAttribute("position", 0, 3);
+	buffer->AddVertexAttribute("position", 0, 3, 0);
 	buffer->AddVertexAttribute("color", 1, 3, 3);
 	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
 	
@@ -119,7 +119,7 @@ static void SetUpTexturedScene(std::shared_ptr<Shader>& textureShader, std::shar
 	buffer2->AddVertexData(8, 20.0f, -20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
 	buffer2->AddVertexData(8, 20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 
-	buffer2->AddVertexAttribute("position", 0, 3);
+	buffer2->AddVertexAttribute("position", 0, 3, 0);
 	buffer2->AddVertexAttribute("color", 1, 3, 3);
 	buffer2->AddVertexAttribute("texCoord", 2, 2, 6);
 
