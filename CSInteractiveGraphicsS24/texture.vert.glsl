@@ -1,14 +1,14 @@
 #version 430
-layout(location = 0) in vec3 position 
+layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 vertexColor;
-layout(location = 2) in vec2 textCord;
+layout(location = 2) in vec2 texCoord;
 
 out vec4 fragColor;
-out vec2 fragTextCoord;
+out vec2 fragTexCoord;
 
 uniform mat4 world;
 uniform mat4 view;
-unifrom mat4 projection;
+uniform mat4 projection;
 
 void main()
 {

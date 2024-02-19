@@ -40,7 +40,7 @@ public:
 
 	inline void SetPrimitiveType(int primitiveType) { this->primitiveType = primitiveType; }
 	inline void SetTextureUnit(int textureUnit) { this->textureUnit = textureUnit; }
-	inline void setTextureUnit(std::shared_ptr<Texture> texture) { this->texture = texture; }
+	inline void setTexture(std::shared_ptr<Texture> texture) { this->texture = texture; }
 
 	// Variadic function
 	void AddVertexData(unsigned int count, ...);
