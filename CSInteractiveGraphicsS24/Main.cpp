@@ -18,11 +18,8 @@
 #include "Shader.h"
 #include "Renderer.h"
 #include "TextFile.h"
+#include "GraphicsEnvironment.h"
 
-void OnWindowSizeChanged(GLFWwindow* window, int width, int height)
-{
-	glViewport(0, 0, width, height);
-}
 
 void ProcessInput(GLFWwindow* window)
 {
@@ -132,87 +129,22 @@ static void SetUpTexturedScene(std::shared_ptr<Shader>& textureShader, std::shar
 	textureScene->AddObject(object2);
 }
 
-
-static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up)
+//Lab 5
+void SetUpScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene)
 {
-	glm::vec3 right = glm::cross(direction, up);
-	right = glm::normalize(right);
-
-	glm::vec3 vUp = glm::cross(right, direction);
-	vUp = glm::normalize(vUp);
-
-	glm::mat4 view(1.0f);
-	view[0] = glm::vec4(right, 0.0f);
-	view[1] = glm::vec4(up, 0.0f);
-	view[2] = glm::vec4(direction, 0.0f);
-	view[3] = glm::vec4(position, 1.0f);
-	return glm::inverse(view);
-}
-
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPWSTR    lpCmdLine,
-	_In_ int       nCmdShow)
-{
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow* window = glfwCreateWindow(1200, 800, "ETSU Computing Interactive Graphics", NULL, NULL);
-	if (window == NULL) {
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
-
-	//Lab 4 Part 7 enable blending
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glViewport(0, 0, 1200, 800);
-	glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
-	//glfwMaximizeWindow(window);
-
-
 	//Read text files 
 	TextFile vertextFile("basic.vert.glsl");
 	TextFile fragmentFile("basic.frag.glsl");
-	
 	std::string vertexSource = vertextFile.GetData();
 	std::string fragmentSource = fragmentFile.GetData();
+	shader = std::make_shared<Shader>(vertexSource, fragmentSource);
 
-	unsigned int shaderProgram;
-	
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>(vertexSource, fragmentSource);
+	//Add Uniforms
 	shader->AddUniform("projection");
 	shader->AddUniform("world");
 	shader->AddUniform("view");
 
-	shaderProgram = shader->GetShaderProgram();
-
-	std::shared_ptr<Renderer> renderer = std::make_shared<Renderer>(shader);
-
-
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
-	float aspectRatio = width / (height * 1.0f);
-
-	float left = -50.0f;
-	float right = 50.0f;
-	float bottom = -50.0f;
-	float top = 50.0f;
-	left *= aspectRatio;
-	right *= aspectRatio;
-	glm::mat4 projection = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
-
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+	scene = std::make_shared<Scene>();
 
 	std::shared_ptr<GraphicsObject> square = std::make_shared<GraphicsObject>();
 	std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(6);
@@ -241,67 +173,90 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	std::shared_ptr<GraphicsObject> line = std::make_shared<GraphicsObject>();
 	std::shared_ptr<VertexBuffer> buffer3 = std::make_shared<VertexBuffer>(6);
 	buffer3->SetPrimitiveType(GL_LINES);
-	buffer3->AddVertexData(6, 0.0f,  2.5f, 0.0f, 0.0f, 1.0f, 0.0f);
+	buffer3->AddVertexData(6, 0.0f, 2.5f, 0.0f, 0.0f, 1.0f, 0.0f);
 	buffer3->AddVertexData(6, 0.0f, -2.5f, 0.0f, 0.0f, 1.0f, 0.0f);
 	buffer3->AddVertexAttribute("position", 0, 3);
 	buffer3->AddVertexAttribute("color", 1, 3, 3);
 	line->SetVertexBuffer(buffer3);
 	line->SetPosition(glm::vec3(5.0f, -10.0f, 0.0f));
 	triangle->AddChild(line);
+}
 
 
-/*
-	unsigned int vaoId;
-	glGenVertexArrays(1, &vaoId);
-	glBindVertexArray(vaoId);
-	auto& objects = scene->GetObjects();
-	for (auto& object : objects) {
-		object->StaticAllocateVertexBuffer();
-	}
-	glBindVertexArray(0);
-*/
+static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up)
+{
+	glm::vec3 right = glm::cross(direction, up);
+	right = glm::normalize(right);
 
-	auto& objects = scene->GetObjects();
-	renderer->AllocateVertexBuffers(objects);
+	glm::vec3 vUp = glm::cross(right, direction);
+	vUp = glm::normalize(vUp);
 
-	//Lab 4 6.2 
+	glm::mat4 view(1.0f);
+	view[0] = glm::vec4(right, 0.0f);
+	view[1] = glm::vec4(up, 0.0f);
+	view[2] = glm::vec4(direction, 0.0f);
+	view[3] = glm::vec4(position, 1.0f);
+	return glm::inverse(view);
+}
 
-	//Declare shared texture shader and texture scene 
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPWSTR    lpCmdLine,
+	_In_ int       nCmdShow)
+{
+	//Lab 5
+	GraphicsEnvironment glfw;
+
+	glfw.Init(4, 3);
+
+	bool created = glfw.SetWindow(1200, 800, "ETSU Computing Interactive Graphics");
+	if (created == false) return -1;
+	
+	bool loaded = glfw.InitGlad();
+	if (loaded == false) return -1;
+
+	glfw.SetupGraphics();
+
+	//Lab 5 Part 2
+	std::shared_ptr<Shader> shader;
+	std::shared_ptr<Scene> scene;
+	SetUpScene1(shader, scene);
+
 	std::shared_ptr<Shader> textureShader;
 	std::shared_ptr<Scene> textureScene;
-
-	//Call setup function
 	SetUpTexturedScene(textureShader, textureScene);
 
-	//Create textureRenderer
-	std::shared_ptr<Renderer> textureRenderer = std::make_shared<Renderer>(textureShader);
+	glfw.CreateRenderer("renderer", shader);
+	glfw.GetRenderer("renderer")->SetScene(scene);
+	glfw.CreateRenderer("textureRenderer", textureShader);
+	glfw.GetRenderer("textureRenderer")->SetScene(textureScene);
 
-	//Allocate objects in texture scene 
-	auto& textureObjects = textureScene->GetObjects();
-	textureRenderer->AllocateVertexBuffers(textureObjects);
+	glfw.staticAllocate();
 
+	GLFWwindow* window = glfw.GetWindow();
 
+	//Needed Lab 5 Part 2 1.43
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	float aspectRatio = width / (height * 1.0f);
 
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 430");
+	float left = -50.0f;
+	float right = 50.0f;
+	float bottom = -50.0f;
+	float top = 50.0f;
+	left *= aspectRatio;
+	right *= aspectRatio;
+	glm::mat4 projection = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+	//Needed
 
 	glm::vec3 clearColor = { 0.2f, 0.3f, 0.3f };
-
-	glUseProgram(shaderProgram);
-
-	shader->SendMat4Uniform("projection", projection);
-
-	//Lab 4 6.3 Send the projection matrix
-	textureShader->SendMat4Uniform("projection", projection);
 
 	float angle = 0, childAngle = 0;
 	float cameraX = -10, cameraY = 0;
 	glm::mat4 view;
 
+	//Lab 5 Part 1
+	ImGuiIO& io = ImGui::GetIO();
 
 	while (!glfwWindowShouldClose(window)) {
 		ProcessInput(window);
@@ -314,36 +269,29 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			glm::vec3(0.0f, 0.0f, -1.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f)
 		);
+	
+		//Lab 4
+		/*
+		renderer->SetScene(scene);
+		renderer->SetView(view);
+		renderer->SetProjection(projection);
+		renderer->RenderScene();
 
-		// Update the objects in the scene
-		for (auto& object : objects) {
-			object->ResetOrientation();
-			object->RotateLocalZ(angle);
-			for (auto& child : object->GetChildren()) {
-				child->ResetOrientation();
-				child->RotateLocalZ(childAngle);
-			}
-		}
-	/*
-		// Render the scene
-		if (shader->IsCreated()) {
-			glUseProgram(shaderProgram);
-			glBindVertexArray(vaoId);
-			shader->SendMat4Uniform("view", view);
-			// Render the objects in the scene
-			for (auto& object : objects) {
-				RenderObject(*object, *shader);
-			}
-			glDisableVertexAttribArray(0);
-			glDisableVertexAttribArray(1);
-			glUseProgram(0);
-			glBindVertexArray(0);
-		}
-	*/
-		renderer->RenderScene(scene, view);
+		
+		textureRenderer->SetScene(textureScene);
+		textureRenderer->SetView(view);
+		textureRenderer->SetProjection(projection);
+		textureRenderer->RenderScene();
+		*/
 
-		//lab 4 6.3
-		textureRenderer->RenderScene(textureScene, view);
+		//Lab 5
+		glfw.GetRenderer("renderer")->SetView(view);
+		glfw.GetRenderer("renderer")->SetProjection(projection);
+		glfw.GetRenderer("renderer")->RenderScene();
+
+		glfw.GetRenderer("textureRenderer")->SetView(view);
+		glfw.GetRenderer("textureRenderer")->SetProjection(projection);
+		glfw.GetRenderer("textureRenderer")->RenderScene();
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
