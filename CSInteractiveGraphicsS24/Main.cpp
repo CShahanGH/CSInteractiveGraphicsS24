@@ -19,14 +19,7 @@
 #include "Renderer.h"
 #include "TextFile.h"
 #include "GraphicsEnvironment.h"
-
-
-void ProcessInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, true);
-	}
-}
+#include "Generate.h"
 
 //Lab 4 
 static void SetUpTexturedScene(std::shared_ptr<Shader>& textureShader, std::shared_ptr<Scene>& textureScene)
@@ -106,7 +99,6 @@ static void SetUpTexturedScene(std::shared_ptr<Shader>& textureShader, std::shar
 	std::shared_ptr<GraphicsObject> object2 = std::make_shared<GraphicsObject>();
 	std::shared_ptr<VertexBuffer> buffer2 = std::make_shared<VertexBuffer>(8);
 
-	std::string absolutepath = "..\\Textures\\kenney_isometric-miniature-bases\\Angle\\base_snow_flat_N.png";
 	texture2->LoadTextureDataFromFile("base_grass_detail_S.png");
 
 	buffer2->AddVertexData(8, -20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
@@ -182,22 +174,134 @@ void SetUpScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene)
 	triangle->AddChild(line);
 }
 
-
-static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up)
+void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene)
 {
-	glm::vec3 right = glm::cross(direction, up);
-	right = glm::normalize(right);
+	//Read texture files and create a textureShader
+	TextFile vertextFile("texture.vert.glsl");
+	TextFile fragmentFile("texture.frag.glsl");
+	std::string vertexSource = vertextFile.GetData();
+	std::string fragmentSource = fragmentFile.GetData();
+	shader = std::make_shared<Shader>(vertexSource, fragmentSource);
+		
+	//Add Unifroms
+	shader->AddUniform("projection");
+	shader->AddUniform("world");
+	shader->AddUniform("view");
+	shader->AddUniform("textUnit");
 
-	glm::vec3 vUp = glm::cross(right, direction);
-	vUp = glm::normalize(vUp);
+	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 
-	glm::mat4 view(1.0f);
-	view[0] = glm::vec4(right, 0.0f);
-	view[1] = glm::vec4(up, 0.0f);
-	view[2] = glm::vec4(direction, 0.0f);
-	view[3] = glm::vec4(position, 1.0f);
-	return glm::inverse(view);
+	texture->setHeight(4);
+	texture->setWidth(4);
+
+	// Create the texture data
+	unsigned char* textureData = new unsigned char[] {
+			0, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 0, 255,
+			0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
+			0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
+			0, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 0, 255
+	};
+
+	texture->setTextureData(64, textureData);
+
+	//Shared scene object
+	scene = std::make_shared<Scene>();
+
+	//Shared graphics object 
+	std::shared_ptr<GraphicsObject> object = std::make_shared<GraphicsObject>();
+
+	//Shared VertexBuffer
+	std::shared_ptr<VertexBuffer> buffer = Generate::Cuboid(10.0f, 5.0f, 5.0f);
+
+	/*
+		A - 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+		B - 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
+		C 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
+		D 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+
+		E 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+		F 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
+		G 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
+		H 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+
+		I 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+		J 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
+		K - 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
+		L - 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+
+		M - 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+		N - 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
+		O - 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
+		P - 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+
+		Q - 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+		R - 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
+		S 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
+		T 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+
+		U 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+		V 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
+		W - 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+		X - 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
+	*/
+
+	buffer->AddVertexAttribute("position", 0, 3, 0);
+	buffer->AddVertexAttribute("color", 1, 3, 3);
+	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
+
+	//Set the buffer's texture
+	buffer->setTexture(texture);
+
+	//Set the object's buffer
+	object->SetVertexBuffer(buffer);
+
+	//Set the object's position
+	object->SetPosition(glm::vec3(0.0f, 2.501f, 0.0f));
+
+	//Add object to the scene
+	scene->AddObject(object);
+
+	//Lab 5 Part 6
+	std::shared_ptr<Texture> crateTex = std::make_shared<Texture>();
+	std::shared_ptr<GraphicsObject> crateObj = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> crateBuffer = Generate::Cuboid(5.0f, 5.0f, 5.0f);
+
+	crateTex->LoadTextureDataFromFile("Wooden Crate Texture.png");
+
+
+	crateBuffer->AddVertexAttribute("position", 0, 3, 0);
+	crateBuffer->AddVertexAttribute("color", 1, 3, 3);
+	crateBuffer->AddVertexAttribute("texCoord", 2, 2, 6);
+
+	crateBuffer->setTexture(crateTex);
+
+	crateObj->SetVertexBuffer(crateBuffer);
+
+	crateObj->SetPosition(glm::vec3(10.0f, 2.501f, -5.0f));
+
+	scene->AddObject(crateObj);
+
+	//Lab 5 Part 7 adding a PLane 
+	std::shared_ptr<Texture> planeTex = std::make_shared<Texture>();
+	std::shared_ptr<GraphicsObject> plane = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> planeBuffer = Generate::XZPlane(15.0f, 15.0f);
+
+	planeTex->LoadTextureDataFromFile("cobblestone_floor_08_diff_1k.jpg");
+
+	planeBuffer->AddVertexAttribute("position", 0, 3, 0);
+	planeBuffer->AddVertexAttribute("color", 1, 3, 3);
+	planeBuffer->AddVertexAttribute("texCoord", 2, 2, 6);
+
+	planeBuffer->setTexture(planeTex);
+
+	plane->SetVertexBuffer(planeBuffer);
+
+	plane->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+
+	scene->AddObject(plane);
 }
+
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -211,7 +315,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	bool created = glfw.SetWindow(1200, 800, "ETSU Computing Interactive Graphics");
 	if (created == false) return -1;
-	
+
 	bool loaded = glfw.InitGlad();
 	if (loaded == false) return -1;
 
@@ -220,7 +324,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Lab 5 Part 2
 	std::shared_ptr<Shader> shader;
 	std::shared_ptr<Scene> scene;
-	SetUpScene1(shader, scene);
+	//SetUpScene1(shader, scene);
+	SetUp3DScene1(shader, scene);
 
 	std::shared_ptr<Shader> textureShader;
 	std::shared_ptr<Scene> textureScene;
@@ -233,91 +338,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	glfw.staticAllocate();
 
-	GLFWwindow* window = glfw.GetWindow();
+	glfw.Run3D();
 
-	//Needed Lab 5 Part 2 1.43
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
-	float aspectRatio = width / (height * 1.0f);
-
-	float left = -50.0f;
-	float right = 50.0f;
-	float bottom = -50.0f;
-	float top = 50.0f;
-	left *= aspectRatio;
-	right *= aspectRatio;
-	glm::mat4 projection = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
-	//Needed
-
-	glm::vec3 clearColor = { 0.2f, 0.3f, 0.3f };
-
-	float angle = 0, childAngle = 0;
-	float cameraX = -10, cameraY = 0;
-	glm::mat4 view;
-
-	//Lab 5 Part 1
-	ImGuiIO& io = ImGui::GetIO();
-
-	while (!glfwWindowShouldClose(window)) {
-		ProcessInput(window);
-
-		glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		view = CreateViewMatrix(
-			glm::vec3(cameraX, cameraY, 1.0f),
-			glm::vec3(0.0f, 0.0f, -1.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f)
-		);
-	
-		//Lab 4
-		/*
-		renderer->SetScene(scene);
-		renderer->SetView(view);
-		renderer->SetProjection(projection);
-		renderer->RenderScene();
-
-		
-		textureRenderer->SetScene(textureScene);
-		textureRenderer->SetView(view);
-		textureRenderer->SetProjection(projection);
-		textureRenderer->RenderScene();
-		*/
-
-		//Lab 5
-		glfw.GetRenderer("renderer")->SetView(view);
-		glfw.GetRenderer("renderer")->SetProjection(projection);
-		glfw.GetRenderer("renderer")->RenderScene();
-
-		glfw.GetRenderer("textureRenderer")->SetView(view);
-		glfw.GetRenderer("textureRenderer")->SetProjection(projection);
-		glfw.GetRenderer("textureRenderer")->RenderScene();
-
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		ImGui::Begin("Computing Interactive Graphics");
-		ImGui::Text(shader->GetLog().c_str());
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-			1000.0f / io.Framerate, io.Framerate);
-		ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
-		ImGui::SliderFloat("Angle", &angle, 0, 360);
-		ImGui::SliderFloat("Child Angle", &childAngle, 0, 360);
-		ImGui::SliderFloat("Camera X", &cameraX, left, right);
-		ImGui::SliderFloat("Camera Y", &cameraY, bottom, top);
-		ImGui::End();
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-
-	glfwTerminate();
-	return 0;
 }
 

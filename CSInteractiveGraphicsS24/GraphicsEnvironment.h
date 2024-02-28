@@ -35,6 +35,14 @@ public:
 	void staticAllocate();
 
 	void Render();
+
+	void ProcessInput(GLFWwindow* window);
+
+	static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up);
+
+	void Run2D();
+
+	void Run3D();
 };
 
 

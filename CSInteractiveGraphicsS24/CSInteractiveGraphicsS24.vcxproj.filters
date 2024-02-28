@@ -57,6 +57,9 @@
     <ClInclude Include="GraphicsEnvironment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Generate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -113,6 +116,9 @@
     <ClCompile Include="GraphicsEnvironment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Generate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="basic.frag.glsl">
@@ -130,6 +136,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="base_grass_detail_S.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="Wooden Crate Texture.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="cobblestone_floor_08_diff_1k.jpg">
       <Filter>Resource Files\textures</Filter>
     </Image>
   </ItemGroup>
