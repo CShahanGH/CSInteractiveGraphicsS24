@@ -4,6 +4,7 @@
 #include <imgui_impl_opengl3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include "Timer.h"
 
 
 GraphicsEnvironment::GraphicsEnvironment()
@@ -230,7 +231,15 @@ void GraphicsEnvironment::Run3D()
 	//Lab 5 Part 1
 	ImGuiIO& io = ImGui::GetIO();
 
+	//Lab 6
+	Timer timer;
+	double elapsedSeconds;
+
 	while (!glfwWindowShouldClose(window)) {
+
+		elapsedSeconds = timer.GetElapsedTimeInSeconds();
+		objectManager.Update(elapsedSeconds); 
+
 		ProcessInput(window);
 		glfwGetWindowSize(window, &width, &height);
 
@@ -285,5 +294,10 @@ void GraphicsEnvironment::Run3D()
 
 	glfwTerminate();
 	return;
+}
+
+void GraphicsEnvironment::AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object)
+{
+	objectManager.SetObject(name, object);
 }
 

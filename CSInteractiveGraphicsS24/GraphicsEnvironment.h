@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseObject.h"
 #include "Renderer.h"
+#include "ObjectManager.h"
 #include <string>
 
 #include <glad/glad.h> 
@@ -11,6 +12,7 @@ class GraphicsEnvironment: public BaseObject
 private: 
 	GLFWwindow* window; 
 	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
+	ObjectManager objectManager;
 
 public: 
 	GraphicsEnvironment();
@@ -43,6 +45,8 @@ public:
 	void Run2D();
 
 	void Run3D();
+
+	void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
 };
 
 

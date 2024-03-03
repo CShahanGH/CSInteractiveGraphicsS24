@@ -174,7 +174,8 @@ void SetUpScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene)
 	triangle->AddChild(line);
 }
 
-void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene)
+//Lab 6 Part 1.6 
+void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
 {
 	//Read texture files and create a textureShader
 	TextFile vertextFile("texture.vert.glsl");
@@ -208,7 +209,7 @@ void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 	scene = std::make_shared<Scene>();
 
 	//Shared graphics object 
-	std::shared_ptr<GraphicsObject> object = std::make_shared<GraphicsObject>();
+	std::shared_ptr<GraphicsObject> cuboid = std::make_shared<GraphicsObject>();
 
 	//Shared VertexBuffer
 	std::shared_ptr<VertexBuffer> buffer = Generate::Cuboid(10.0f, 5.0f, 5.0f);
@@ -253,13 +254,15 @@ void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 	buffer->setTexture(texture);
 
 	//Set the object's buffer
-	object->SetVertexBuffer(buffer);
+	cuboid->SetVertexBuffer(buffer);
 
 	//Set the object's position
-	object->SetPosition(glm::vec3(0.0f, 2.501f, 0.0f));
+	cuboid->SetPosition(glm::vec3(0.0f, 2.501f, 0.0f));
 
 	//Add object to the scene
-	scene->AddObject(object);
+	scene->AddObject(cuboid);
+
+	graphicsenvironment.AddObject("cuboid", cuboid);
 
 	//Lab 5 Part 6
 	std::shared_ptr<Texture> crateTex = std::make_shared<Texture>();
@@ -281,6 +284,8 @@ void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 
 	scene->AddObject(crateObj);
 
+	graphicsenvironment.AddObject("crate", crateObj);
+
 	//Lab 5 Part 7 adding a PLane 
 	std::shared_ptr<Texture> planeTex = std::make_shared<Texture>();
 	std::shared_ptr<GraphicsObject> plane = std::make_shared<GraphicsObject>();
@@ -299,6 +304,8 @@ void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 	plane->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	scene->AddObject(plane);
+
+	graphicsenvironment.AddObject("plane", plane);
 }
 
 
@@ -324,8 +331,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Lab 5 Part 2
 	std::shared_ptr<Shader> shader;
 	std::shared_ptr<Scene> scene;
+	GraphicsEnvironment environment; //Lab 6
 	//SetUpScene1(shader, scene);
-	SetUp3DScene1(shader, scene);
+	SetUp3DScene1(shader, scene, environment);
 
 	std::shared_ptr<Shader> textureShader;
 	std::shared_ptr<Scene> textureScene;
