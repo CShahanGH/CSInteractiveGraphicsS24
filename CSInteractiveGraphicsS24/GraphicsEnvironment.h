@@ -2,6 +2,8 @@
 #include "BaseObject.h"
 #include "Renderer.h"
 #include "ObjectManager.h"
+#include "Camera.h"
+#include "GraphicsStructures.h"
 #include <string>
 
 #include <glad/glad.h> 
@@ -12,7 +14,10 @@ class GraphicsEnvironment: public BaseObject
 private: 
 	GLFWwindow* window; 
 	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
-	ObjectManager objectManager;
+	std::shared_ptr<ObjectManager> objectManager;
+	std::shared_ptr<Camera> camera;
+	static GraphicsEnvironment* self; //Lab 6 Part 4
+	MouseParams mouse; 
 
 public: 
 	GraphicsEnvironment();
@@ -38,7 +43,7 @@ public:
 
 	void Render();
 
-	void ProcessInput(GLFWwindow* window);
+	void ProcessInput(GLFWwindow* window, double elapsedSeconds);
 
 	static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up);
 
@@ -47,6 +52,8 @@ public:
 	void Run3D();
 
 	void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
+
+	static void OnMouseMove(GLFWwindow* window, double mouseX, double mouseY);
 };
 
 

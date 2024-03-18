@@ -1,15 +1,22 @@
 #include "GraphicsEnvironment.h"
+#include "GraphicsStructures.h"
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include "Timer.h"
+#include "RotateAnimation.h"
+#include "ObjectManager.h"
 
+GraphicsEnvironment* GraphicsEnvironment::self;
 
 GraphicsEnvironment::GraphicsEnvironment()
 {
-
+	window = 0;
+	objectManager = std::make_shared<ObjectManager>();
+	camera = std::make_shared<Camera>();
+	self = this;
 }
 
 GraphicsEnvironment::~GraphicsEnvironment()
@@ -72,12 +79,17 @@ void GraphicsEnvironment::SetupGraphics()
 
 	//Enable Multisampling 
 	glEnable(GL_MULTISAMPLE);
+
+	glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
+
+	//OnMouseMove
+	//OnMouseMove(window, mouse.x, mouse.y);
+	glfwSetCursorPosCallback(window, OnMouseMove);
 }
 
 void GraphicsEnvironment::OnWindowSizeChanged(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
-	glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
 	//glfwMaximizeWindow(window);
 
 }
@@ -104,10 +116,28 @@ void GraphicsEnvironment::Render()
 	}
 }
 
-void GraphicsEnvironment::ProcessInput(GLFWwindow* window)
+void GraphicsEnvironment::ProcessInput(GLFWwindow* window, double elapsedSeconds)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
+	}
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		camera->MoveForward(elapsedSeconds);
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		camera->MoveBackward(elapsedSeconds);
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		camera->MoveLeft(elapsedSeconds);
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		camera->MoveRight(elapsedSeconds);
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		camera->MoveUp(elapsedSeconds);
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		camera->MoveDown(elapsedSeconds);
 	}
 }
 
@@ -153,7 +183,7 @@ void GraphicsEnvironment::Run2D()
 
 	//Render Loop
 	while (!glfwWindowShouldClose(window)) {
-		ProcessInput(window);
+		//ProcessInput(window); Needs timer 
 
 		glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -219,9 +249,11 @@ void GraphicsEnvironment::Run3D()
 	float farPlane = 50.0f;
 	float fieldOfView = 60;
 
-	glm::vec3 cameraPosition(15.0f, 15.0f, 20.0f);
+	//Lab 6 Part 3
+	glm::vec3 cameraPosition(0.0f, 10.0f, 15.0f);
+	camera->SetPosition(cameraPosition);
 	glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
-	glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+	//glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
 	glm::mat4 view;
 	glm::mat4 projection;
@@ -235,22 +267,32 @@ void GraphicsEnvironment::Run3D()
 	Timer timer;
 	double elapsedSeconds;
 
+	//Lab 6 Part 2.5 
+	std::shared_ptr<RotateAnimation> rotateAnimation = std::make_shared<RotateAnimation>();
+	rotateAnimation->SetObject(objectManager->GetObject("Crate"));
+	objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
+
 	while (!glfwWindowShouldClose(window)) {
 
 		elapsedSeconds = timer.GetElapsedTimeInSeconds();
-		objectManager.Update(elapsedSeconds); 
 
-		ProcessInput(window);
+		ProcessInput(window, elapsedSeconds);
 		glfwGetWindowSize(window, &width, &height);
+
+		//Lab 6 Part 4 
+		mouse.windowWidth = width;
+		mouse.windowHeight = height;
+
 
 		glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		referenceFrame = glm::rotate(glm::mat4(1.0f), glm::radians(cubeYAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-		referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeXAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-		referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
+		//referenceFrame = glm::rotate(glm::mat4(1.0f), glm::radians(cubeYAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+		//referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeXAngle), glm::vec3(1.0f, 0.0f, 0.0f));
+		//referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+		camera->SetLookFrame(mouse.spherical.ToMat4()); 
+		view = camera->LookForward();
 
 		if (width >= height) {
 			aspectRatio = width / (height * 1.0f);
@@ -261,7 +303,9 @@ void GraphicsEnvironment::Run3D()
 		projection = glm::perspective(
 			glm::radians(fieldOfView), aspectRatio, nearPlane, farPlane);
 
-		// Render the object
+		objectManager->Update(elapsedSeconds);
+
+		// Render the scene
 		GetRenderer("renderer")->SetView(view);
 		GetRenderer("renderer")->SetProjection(projection);
 		GetRenderer("renderer")->RenderScene();
@@ -270,9 +314,10 @@ void GraphicsEnvironment::Run3D()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		ImGui::Begin("Computing Interactive Graphics");
-		ImGui::Text(GetRenderer("renderer")->GetShader()->GetLog().c_str()); //Needed?;
+		ImGui::Text(GetRenderer("renderer")->GetShader()->GetLog().c_str()); 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
 			1000.0f / io.Framerate, io.Framerate);
+		ImGui::Text("Elapsed seconds: %.3f", elapsedSeconds); //Lab 6
 		ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
 		ImGui::SliderFloat("X Angle", &cubeXAngle, 0, 360);
 		ImGui::SliderFloat("Y Angle", &cubeYAngle, 0, 360);
@@ -298,6 +343,18 @@ void GraphicsEnvironment::Run3D()
 
 void GraphicsEnvironment::AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object)
 {
-	objectManager.SetObject(name, object);
+	objectManager->SetObject(name, object);
+}
+
+void GraphicsEnvironment::OnMouseMove(GLFWwindow* window, double mouseX, double mouseY)
+{
+	self->mouse.x = mouseX;
+	self->mouse.y = mouseY;
+
+	float xPercent = static_cast<float>(self->mouse.x / self->mouse.windowWidth);
+	float yPercent = static_cast<float>(self->mouse.y / self->mouse.windowHeight);
+
+	self->mouse.spherical.theta = 90.0f - (xPercent * 180); // left/right
+	self->mouse.spherical.phi = 180.0f - (yPercent * 180); // up/down
 }
 

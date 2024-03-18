@@ -12,7 +12,6 @@ public:
 	~ObjectManager();
 
 	std::shared_ptr<GraphicsObject> GetObject(const std::string& name) { return objectMap[name]; }
-	std::unordered_map<std::string, std::shared_ptr<GraphicsObject>> GetObjectMap() const { return objectMap; }
 
 	void SetObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
 

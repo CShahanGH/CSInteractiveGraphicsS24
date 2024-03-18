@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <memory>
-
+#include "IAnimation.h"
 #include "VertexBuffer.h"
 
 class GraphicsObject
@@ -11,6 +11,7 @@ protected:
 	std::shared_ptr<VertexBuffer> buffer;
 	GraphicsObject* parent;
 	std::vector<std::shared_ptr<GraphicsObject>> children;
+	std::shared_ptr<IAnimation> animation = nullptr;
 
 public:
 	GraphicsObject();
@@ -36,5 +37,7 @@ public:
 	void SetReferenceFrame(glm::mat4& referenceFrame) { this->referenceFrame = referenceFrame; } //Lab 5 Part  4
 
 	void Update(double elapsedSeconds); //Lab 6
+	void SetAnimation(std::shared_ptr<IAnimation> animation) { this->animation = animation; }
+	glm::mat4& GetLocalReferenceFrame() { return referenceFrame; }
 };
 
