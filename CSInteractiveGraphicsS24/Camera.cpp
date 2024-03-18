@@ -70,6 +70,51 @@ void Camera::MoveDown(double elapsedSeconds)
 	return;
 }
 
+glm::mat4 Camera::LookRight()
+{
+	glm::mat4 view;
+
+	glm::vec3 cameraPosition = referenceframe[3];
+	glm::vec3 cameraRight = -lookframe[0];
+	glm::vec3 cameraTarget = cameraPosition + cameraRight;
+	glm::vec3 cameraUp = lookframe[1];
+	view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+
+	return view;
+}
+
+glm::mat4 Camera::LookLeft()
+{
+	glm::mat4 view;
+
+	glm::vec3 cameraPosition = referenceframe[3];
+	glm::vec3 cameraLeft = lookframe[0];
+	glm::vec3 cameraTarget = cameraPosition + cameraLeft;
+	glm::vec3 cameraUp = lookframe[1];
+	view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+
+	return view;
+}
+
+glm::mat4 Camera::LookBehind()
+{
+	glm::mat4 view;
+
+	glm::vec3 cameraPosition = referenceframe[3];
+	glm::vec3 cameraBehind = lookframe[2];
+	glm::vec3 cameraTarget = cameraPosition + cameraBehind;
+	glm::vec3 cameraUp = lookframe[1];
+	view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+
+	return view;
+}
+
+void Camera::ToggleMouse()
+{
+	lookwithmouse = !lookwithmouse;
+	return;
+}
+
 glm::mat4 Camera::LookForward()
 {
 	glm::mat4 view; 

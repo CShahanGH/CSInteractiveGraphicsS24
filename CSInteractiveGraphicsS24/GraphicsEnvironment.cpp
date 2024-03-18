@@ -81,10 +81,7 @@ void GraphicsEnvironment::SetupGraphics()
 	glEnable(GL_MULTISAMPLE);
 
 	glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
-
-	//OnMouseMove
-	//OnMouseMove(window, mouse.x, mouse.y);
-	glfwSetCursorPosCallback(window, OnMouseMove);
+	glfwSetCursorPosCallback(window, OnMouseMove); //Can't use IMGUI 
 }
 
 void GraphicsEnvironment::OnWindowSizeChanged(GLFWwindow* window, int width, int height)
@@ -116,7 +113,7 @@ void GraphicsEnvironment::Render()
 	}
 }
 
-void GraphicsEnvironment::ProcessInput(GLFWwindow* window, double elapsedSeconds)
+void GraphicsEnvironment::ProcessInput(GLFWwindow* window, double elapsedSeconds, glm::mat4& view)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
@@ -139,6 +136,40 @@ void GraphicsEnvironment::ProcessInput(GLFWwindow* window, double elapsedSeconds
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		camera->MoveDown(elapsedSeconds);
 	}
+	//lab 7
+	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
+	{
+		camera->ToggleMouse();
+	}
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
+		glm::vec3 cameraPosition(0.0f, 5.0f, 30.0f);
+		camera->SetPosition(cameraPosition);
+		camera->SetLookFrame(glm::mat4(1.0f)); //Reset Look Frame
+		view = camera->LookForward();
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	{
+		glm::vec3 cameraPosition(30.0f, 5.0f, 0.0f);
+		camera->SetPosition(cameraPosition);
+		camera->SetLookFrame(glm::mat4(1.0f)); //Reset Look Frame
+		view = camera->LookRight();
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	{
+		glm::vec3 cameraPosition(0.0f, 5.0f, -30.0f);
+		camera->SetPosition(cameraPosition);
+		camera->SetLookFrame(glm::mat4(1.0f)); //Reset Look Frame
+		view = camera->LookBehind();
+	}
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		glm::vec3 cameraPosition(-30.0f, 5.0f, 0.0f);
+		camera->SetPosition(cameraPosition);
+		camera->SetLookFrame(glm::mat4(1.0f)); //Reset Look Frame
+		view = camera->LookLeft();
+	}
+
 }
 
 glm::mat4 GraphicsEnvironment::CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up)
@@ -255,7 +286,7 @@ void GraphicsEnvironment::Run3D()
 	glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
 	//glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
-	glm::mat4 view;
+	glm::mat4 view = camera->LookForward(); //Lab7 set default view
 	glm::mat4 projection;
 	glm::mat4 referenceFrame(1.0f);
 	glm::vec3 clearColor = { 0.2f, 0.3f, 0.3f };
@@ -276,7 +307,7 @@ void GraphicsEnvironment::Run3D()
 
 		elapsedSeconds = timer.GetElapsedTimeInSeconds();
 
-		ProcessInput(window, elapsedSeconds);
+		ProcessInput(window, elapsedSeconds, view);
 		glfwGetWindowSize(window, &width, &height);
 
 		//Lab 6 Part 4 
@@ -291,8 +322,14 @@ void GraphicsEnvironment::Run3D()
 		//referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeXAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 		//referenceFrame = glm::rotate(referenceFrame, glm::radians(cubeZAngle), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		camera->SetLookFrame(mouse.spherical.ToMat4()); 
-		view = camera->LookForward();
+		//Lab 7
+		if (camera->LookWithMouse())
+		{
+			camera->SetLookFrame(mouse.spherical.ToMat4());
+			view = camera->LookForward();
+		}
+		//Note Can't see camera updating =
+		
 
 		if (width >= height) {
 			aspectRatio = width / (height * 1.0f);

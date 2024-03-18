@@ -43,7 +43,7 @@ public:
 
 	void Render();
 
-	void ProcessInput(GLFWwindow* window, double elapsedSeconds);
+	void ProcessInput(GLFWwindow* window, double elapsedSeconds, glm::mat4& view);
 
 	static glm::mat4 CreateViewMatrix(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up);
 
