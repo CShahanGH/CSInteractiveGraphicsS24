@@ -32,3 +32,18 @@ struct MouseParams {
     int windowWidth = 0, windowHeight = 0;
     float fieldOfView = 60.0f;
 };
+
+//Lab 7
+struct Material {
+    float ambientIntensity;  // 0 to 1
+    float specularIntensity; // 0 to 1
+    float shininess;         // 0 to infinity
+};
+
+
+struct Light {
+    glm::vec3 position;
+    glm::vec3 color;
+    float intensity;
+    float attenuationCoef;
+};

@@ -4,6 +4,7 @@
 #include "GraphicsObject.h"
 #include "Scene.h"
 #include <glm/glm.hpp>
+#include "Camera.h"
 
 class Renderer : public BaseObject
 {
@@ -26,9 +27,9 @@ public:
 	inline void SetProjection(glm::mat4 projection) { this->projection = projection; }
 
 	void AllocateVertexBuffers(const std::vector<std::shared_ptr<GraphicsObject>>& objects);
-	void RenderScene();
+	void RenderScene(const Camera& camera);
 
 private: 
-	void RenderObject(const GraphicsObject& object);
+	void RenderObject(GraphicsObject& object);
 };
 

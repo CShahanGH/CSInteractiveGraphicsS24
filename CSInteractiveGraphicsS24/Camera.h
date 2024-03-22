@@ -21,6 +21,7 @@ public:
 	glm::mat4 GetLookFrame() { return lookframe; }
 	void SetMoveSpeed(float movespeed) { this->movespeed = movespeed;  }
 	void SetPosition(glm::vec3 position) { this->referenceframe[3] = glm::vec4(position, 1.0f); }
+	glm::vec3 GetPosition() const { return referenceframe[3]; }
 
 	bool LookWithMouse() { return lookwithmouse; }
 

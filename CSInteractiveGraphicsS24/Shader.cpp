@@ -53,6 +53,22 @@ void Shader::SendIntUniform(const std::string& uniformName, int value)
 	glUniform1i(uniformLocation, value);
 }
 
+//Lab 7
+
+void Shader::SendVec3Uniform(const std::string& uniformName, const glm::vec3& vec)
+{
+	glUseProgram(shaderProgram);
+	unsigned int uniformLocation = glGetUniformLocation(shaderProgram, uniformName.c_str());
+	glUniform3fv(uniformLocation, 1, glm::value_ptr(vec));
+}
+
+void Shader::SendFloatUniform(const  std::string& uniformName, float value)
+{
+	glUseProgram(shaderProgram);
+	unsigned int uniformLocation = glGetUniformLocation(shaderProgram, uniformName.c_str());
+	glUniform1f(uniformLocation, value);
+}
+
 void Shader::SetDefaultSource()
 {
 	vertexSource =

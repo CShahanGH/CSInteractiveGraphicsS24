@@ -30,6 +30,10 @@ public:
 	//Lab 4
 	void SendIntUniform(const std::string& uniformName, int value);
 
+	//Lab 7 
+	void SendVec3Uniform(const std::string& uniformName, const glm::vec3& vec);
+	void SendFloatUniform(const  std::string& uniformName, float value); 
+
 private:
 	void SetDefaultSource();
 

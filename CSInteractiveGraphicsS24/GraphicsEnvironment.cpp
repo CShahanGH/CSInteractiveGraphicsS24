@@ -60,11 +60,6 @@ void GraphicsEnvironment::SetupGraphics()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 430");
 
 	// Cull back faces and use counter-clockwise winding of front faces
 	glEnable(GL_CULL_FACE);
@@ -82,6 +77,12 @@ void GraphicsEnvironment::SetupGraphics()
 
 	glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
 	glfwSetCursorPosCallback(window, OnMouseMove); //Can't use IMGUI 
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 430");
 }
 
 void GraphicsEnvironment::OnWindowSizeChanged(GLFWwindow* window, int width, int height)
@@ -109,7 +110,7 @@ void GraphicsEnvironment::staticAllocate()
 void GraphicsEnvironment::Render()
 {
 	for (const auto& [name, renderer] : rendererMap) {
-		renderer->RenderScene();
+		renderer->RenderScene(*camera);
 	}
 }
 
@@ -146,28 +147,31 @@ void GraphicsEnvironment::ProcessInput(GLFWwindow* window, double elapsedSeconds
 		glm::vec3 cameraPosition(0.0f, 5.0f, 30.0f);
 		camera->SetPosition(cameraPosition);
 		camera->SetLookFrame(glm::mat4(1.0f)); //Reset Look Frame
-		view = camera->LookForward();
 	}
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 	{
+		glm::mat4 lookframe(1.0f);
+		lookframe = glm::rotate(lookframe, glm::radians(90.0f), { 0, 1, 0 });
 		glm::vec3 cameraPosition(30.0f, 5.0f, 0.0f);
 		camera->SetPosition(cameraPosition);
-		camera->SetLookFrame(glm::mat4(1.0f)); //Reset Look Frame
-		view = camera->LookRight();
+		camera->SetLookFrame(lookframe); //Reset Look Frame
+		
 	}
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 	{
+		glm::mat4 lookframe(1.0f);
+		lookframe = glm::rotate(lookframe, glm::radians(180.0f), { 0, 1, 0 });
 		glm::vec3 cameraPosition(0.0f, 5.0f, -30.0f);
 		camera->SetPosition(cameraPosition);
-		camera->SetLookFrame(glm::mat4(1.0f)); //Reset Look Frame
-		view = camera->LookBehind();
+		camera->SetLookFrame(lookframe); //Reset Look Frame
 	}
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 	{
+		glm::mat4 lookframe(1.0f);
+		lookframe = glm::rotate(lookframe, glm::radians(-90.0f), { 0, 1, 0 });
 		glm::vec3 cameraPosition(-30.0f, 5.0f, 0.0f);
 		camera->SetPosition(cameraPosition);
-		camera->SetLookFrame(glm::mat4(1.0f)); //Reset Look Frame
-		view = camera->LookLeft();
+		camera->SetLookFrame(lookframe); //Reset Look Frame
 	}
 
 }
@@ -228,11 +232,11 @@ void GraphicsEnvironment::Run2D()
 		//Lab 5
 		GetRenderer("renderer")->SetView(view);
 		GetRenderer("renderer")->SetProjection(projection);
-		GetRenderer("renderer")->RenderScene();
+		GetRenderer("renderer")->RenderScene(*camera);
 
 		GetRenderer("textureRenderer")->SetView(view);
 		GetRenderer("textureRenderer")->SetProjection(projection);
-		GetRenderer("textureRenderer")->RenderScene();
+		GetRenderer("textureRenderer")->RenderScene(*camera);
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -281,7 +285,7 @@ void GraphicsEnvironment::Run3D()
 	float fieldOfView = 60;
 
 	//Lab 6 Part 3
-	glm::vec3 cameraPosition(0.0f, 10.0f, 15.0f);
+	glm::vec3 cameraPosition(0.0f, 5.0f, 30.0f);
 	camera->SetPosition(cameraPosition);
 	glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
 	//glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
@@ -299,9 +303,14 @@ void GraphicsEnvironment::Run3D()
 	double elapsedSeconds;
 
 	//Lab 6 Part 2.5 
-	std::shared_ptr<RotateAnimation> rotateAnimation = std::make_shared<RotateAnimation>();
-	rotateAnimation->SetObject(objectManager->GetObject("Crate"));
-	objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
+	//std::shared_ptr<RotateAnimation> rotateAnimation = std::make_shared<RotateAnimation>();
+	//rotateAnimation->SetObject(objectManager->GetObject("Crate"));
+	//objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
+
+	//Lab 7 
+	bool correctGamma = false;
+
+	objectManager->GetObject("Lightbulb")->SetPosition(GetRenderer("renderer")->GetScene()->GetLocalLight().position);
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -314,6 +323,14 @@ void GraphicsEnvironment::Run3D()
 		mouse.windowWidth = width;
 		mouse.windowHeight = height;
 
+		if (correctGamma)
+		{
+			glEnable(GL_FRAMEBUFFER_SRGB);
+		}
+		else
+		{
+			glDisable(GL_FRAMEBUFFER_SRGB);
+		}
 
 		glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -326,9 +343,15 @@ void GraphicsEnvironment::Run3D()
 		if (camera->LookWithMouse())
 		{
 			camera->SetLookFrame(mouse.spherical.ToMat4());
-			view = camera->LookForward();
 		}
-		//Note Can't see camera updating =
+		view = camera->LookForward();
+		
+		//Set Local Light Position 
+		objectManager->GetObject("Lightbulb")->SetPosition(GetRenderer("renderer")->GetScene()->GetLocalLight().position);
+
+		// Make lightbulb face camera
+		glm::mat4 LightBulbReferenceFrame = objectManager->GetObject("Lightbulb")->GetReferenceFrame();
+		objectManager->GetObject("Lightbulb")->PointAt(LightBulbReferenceFrame, camera->GetPosition());
 		
 
 		if (width >= height) {
@@ -342,10 +365,15 @@ void GraphicsEnvironment::Run3D()
 
 		objectManager->Update(elapsedSeconds);
 
-		// Render the scene
+		// Render the scene (cuboid, crate, floor) 
 		GetRenderer("renderer")->SetView(view);
 		GetRenderer("renderer")->SetProjection(projection);
-		GetRenderer("renderer")->RenderScene();
+		GetRenderer("renderer")->RenderScene(*camera);
+
+		//Lab 7 Render the lightbulb 
+		GetRenderer("lightbulbrenderer")->SetView(view);
+		GetRenderer("lightbulbrenderer")->SetProjection(projection);
+		GetRenderer("lightbulbrenderer")->RenderScene(*camera);
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -359,9 +387,10 @@ void GraphicsEnvironment::Run3D()
 		ImGui::SliderFloat("X Angle", &cubeXAngle, 0, 360);
 		ImGui::SliderFloat("Y Angle", &cubeYAngle, 0, 360);
 		ImGui::SliderFloat("Z Angle", &cubeZAngle, 0, 360);
-		ImGui::SliderFloat("Camera X", &cameraPosition.x, left, right);
-		ImGui::SliderFloat("Camera Y", &cameraPosition.y, bottom, top);
-		ImGui::SliderFloat("Camera Z", &cameraPosition.z, 20, 50);
+		ImGui::SliderFloat("Global Intensity", &GetRenderer("renderer")->GetScene()->GetGlobalLight().intensity, 0, 1);
+		ImGui::SliderFloat("Local Intensity", &GetRenderer("renderer")->GetScene()->GetLocalLight().intensity, 0, 1);
+		ImGui::Checkbox("Correct gamma", &correctGamma);
+		ImGui::DragFloat3("Set Local Light Position", &GetRenderer("renderer")->GetScene()->GetLocalLight().position.x);
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

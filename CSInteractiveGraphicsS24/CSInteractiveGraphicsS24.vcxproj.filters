@@ -166,6 +166,12 @@
     <None Include="texture.vert.glsl">
       <Filter>Source Files\src\glsl</Filter>
     </None>
+    <None Include="lighting.frag.glsl">
+      <Filter>Source Files\src\glsl</Filter>
+    </None>
+    <None Include="lighting.vert.glsl">
+      <Filter>Source Files\src\glsl</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="base_grass_detail_S.png">
@@ -175,6 +181,9 @@
       <Filter>Resource Files\textures</Filter>
     </Image>
     <Image Include="cobblestone_floor_08_diff_1k.jpg">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="lightbulb.png">
       <Filter>Resource Files\textures</Filter>
     </Image>
   </ItemGroup>

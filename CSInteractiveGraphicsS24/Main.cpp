@@ -308,6 +308,168 @@ void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 	graphicsenvironment.AddObject("Plane", plane);
 }
 
+//Lab 7
+void SetUp3DScene2(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
+{
+	//Read texture files and create a textureShader
+	TextFile vertextFile("lighting.vert.glsl");
+	TextFile fragmentFile("lighting.frag.glsl");
+	std::string vertexSource = vertextFile.GetData();
+	std::string fragmentSource = fragmentFile.GetData();
+	shader = std::make_shared<Shader>(vertexSource, fragmentSource);
+
+	//Add Unifroms
+	shader->AddUniform("projection");
+	shader->AddUniform("world");
+	shader->AddUniform("view");
+	shader->AddUniform("textUnit");
+	shader->AddUniform("materialAmbientIntensity");
+	shader->AddUniform("materialSpecularIntensity");
+	shader->AddUniform("materialShininess");
+	shader->AddUniform("globalLightPosition");
+	shader->AddUniform("globalLightIntensity");
+	shader->AddUniform("globalLightColor");
+	shader->AddUniform("localLightPosition");
+	shader->AddUniform("localLightColor");
+	shader->AddUniform("localLightIntensity");
+	shader->AddUniform("localLightAttenuationCoef");
+	shader->AddUniform("viewPosition");
+
+	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
+
+	texture->setHeight(4);
+	texture->setWidth(4);
+
+	// Create the texture data
+	unsigned char* textureData = new unsigned char[] {
+		0, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 0, 255,
+			0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
+			0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
+			0, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 0, 255
+		};
+
+	texture->setTextureData(64, textureData);
+
+	//Shared scene object
+	scene = std::make_shared<Scene>();
+
+	//Shared graphics object 
+	std::shared_ptr<GraphicsObject> cuboid = std::make_shared<GraphicsObject>();
+
+	//Shared VertexBuffer
+	std::shared_ptr<VertexBuffer> buffer = Generate::CuboidWithNormals(10.0f, 5.0f, 5.0f); // Lab 7 3.3?
+
+	buffer->AddVertexAttribute("position", 0, 3, 0);
+	buffer->AddVertexAttribute("vertexColor", 1, 4, 3);
+	buffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	buffer->AddVertexAttribute("texCoord", 3, 2, 10);
+
+	//Set the buffer's texture
+	buffer->setTexture(texture);
+
+	//Set the object's buffer
+	cuboid->SetVertexBuffer(buffer);
+
+	//Set the object's position
+	cuboid->SetPosition(glm::vec3(0.0f, 2.501f, 0.0f));
+
+	//Add object to the scene
+	scene->AddObject(cuboid);
+
+	graphicsenvironment.AddObject("Cuboid", cuboid);
+
+	//Lab 7 Adding Crate with Normals
+
+	std::shared_ptr<Texture> crateTex = std::make_shared<Texture>();
+	std::shared_ptr<GraphicsObject> crateObj = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> crateBuffer = Generate::CuboidWithNormals(5.0f, 5.0f, 5.0f);
+
+	crateTex->LoadTextureDataFromFile("Wooden Crate Texture.png");
+
+
+	crateBuffer->AddVertexAttribute("position", 0, 3, 0);
+	crateBuffer->AddVertexAttribute("color", 1, 4, 3);
+	crateBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	crateBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
+
+	crateBuffer->setTexture(crateTex);
+
+	crateObj->SetVertexBuffer(crateBuffer);
+
+	crateObj->SetPosition(glm::vec3(10.0f, 2.501f, -5.0f));
+
+	scene->AddObject(crateObj);
+
+	graphicsenvironment.AddObject("Crate", crateObj);
+
+	//Lab 7 Adding Plane With Normals 
+	
+	std::shared_ptr<Texture> planeTex = std::make_shared<Texture>();
+	std::shared_ptr<GraphicsObject> plane = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> planeBuffer = Generate::XZPlaneWithNormals(15.0f, 15.0f);
+
+	planeTex->LoadTextureDataFromFile("cobblestone_floor_08_diff_1k.jpg");
+
+	planeBuffer->AddVertexAttribute("position", 0, 3, 0);
+	planeBuffer->AddVertexAttribute("color", 1, 4, 3);
+	planeBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	planeBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
+
+	planeBuffer->setTexture(planeTex);
+
+	plane->SetVertexBuffer(planeBuffer);
+
+	plane->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+
+	scene->AddObject(plane);
+
+	graphicsenvironment.AddObject("Plane", plane);
+}
+
+//Lab 7 Part 3 
+
+void SetUpLightBulb(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
+{
+	//Read texture files and create a textureShader
+	TextFile vertextFile("texture.vert.glsl");
+	TextFile fragmentFile("texture.frag.glsl");
+	std::string vertexSource = vertextFile.GetData();
+	std::string fragmentSource = fragmentFile.GetData();
+	shader = std::make_shared<Shader>(vertexSource, fragmentSource);
+
+	//Add Unifroms
+	shader->AddUniform("projection");
+	shader->AddUniform("world");
+	shader->AddUniform("view");
+	shader->AddUniform("textUnit");
+
+	//Shared scene object
+	scene = std::make_shared<Scene>();
+
+	//Lab 7 Adding Crate with Normals
+
+	std::shared_ptr<Texture> LightbulbTex = std::make_shared<Texture>();
+	std::shared_ptr<GraphicsObject> LightbulbObj = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> LightbulbBuffer = Generate::XYPlane(1.0f, 1.0f);
+
+	LightbulbTex->LoadTextureDataFromFile("lightbulb.png");
+
+
+	LightbulbBuffer->AddVertexAttribute("position", 0, 3, 0);
+	LightbulbBuffer->AddVertexAttribute("color", 1, 3, 3);
+	LightbulbBuffer->AddVertexAttribute("texCoord", 2, 2, 6);
+
+	LightbulbBuffer->setTexture(LightbulbTex);
+
+	LightbulbObj->SetVertexBuffer(LightbulbBuffer);
+
+	LightbulbObj->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+
+	scene->AddObject(LightbulbObj);
+
+	graphicsenvironment.AddObject("Lightbulb", LightbulbObj);
+}
+
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -333,16 +495,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	std::shared_ptr<Scene> scene;
 	//Lab 6
 	//SetUpScene1(shader, scene);
-	SetUp3DScene1(shader, scene, glfw);
+	//SetUp3DScene1(shader, scene, glfw);
 
 	std::shared_ptr<Shader> textureShader;
 	std::shared_ptr<Scene> textureScene;
-	SetUpTexturedScene(textureShader, textureScene);
+	//SetUpTexturedScene(textureShader, textureScene);
 
-	glfw.CreateRenderer("renderer", shader);
-	glfw.GetRenderer("renderer")->SetScene(scene);
-	glfw.CreateRenderer("textureRenderer", textureShader);
-	glfw.GetRenderer("textureRenderer")->SetScene(textureScene);
+	//Lab 7
+	std::shared_ptr<Shader> shader2;
+	std::shared_ptr<Scene> scene2;
+	SetUp3DScene2(shader2, scene2, glfw);
+
+	glfw.CreateRenderer("renderer", shader2);
+	glfw.GetRenderer("renderer")->SetScene(scene2);
+	
+	//Lightbulb 
+	std::shared_ptr<Shader> lightbulbshader;
+	std::shared_ptr<Scene> lightbulbscene;
+	SetUpLightBulb(lightbulbshader, lightbulbscene, glfw);
+	glfw.CreateRenderer("lightbulbrenderer", lightbulbshader);
+	glfw.GetRenderer("lightbulbrenderer")->SetScene(lightbulbscene);
 
 	glfw.staticAllocate();
 

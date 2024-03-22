@@ -180,12 +180,15 @@
   <ItemGroup>
     <None Include="basic.frag.glsl" />
     <None Include="basic.vert.glsl" />
+    <None Include="lighting.frag.glsl" />
+    <None Include="lighting.vert.glsl" />
     <None Include="texture.frag.glsl" />
     <None Include="texture.vert.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="base_grass_detail_S.png" />
     <Image Include="cobblestone_floor_08_diff_1k.jpg" />
+    <Image Include="lightbulb.png" />
     <Image Include="Wooden Crate Texture.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
