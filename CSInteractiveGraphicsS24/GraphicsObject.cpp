@@ -1,7 +1,7 @@
 #include "GraphicsObject.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-GraphicsObject::GraphicsObject() : referenceFrame(1.0f), parent(nullptr), material{ 0.3f, 0.1f ,0.1f }
+GraphicsObject::GraphicsObject() : referenceFrame(1.0f), parent(nullptr), material{ 0.1f, 0.5f ,16.0f }
 {
 	
 }
@@ -73,7 +73,7 @@ void GraphicsObject::Update(double elapsedSeconds)
 	}
 }
 
-void GraphicsObject::PointAt(glm::mat4& referenceFrame, const glm::vec3& point)
+void GraphicsObject::PointAt(const glm::vec3& point)
 {
 	glm::vec3 position = referenceFrame[3];
 	glm::vec3 zAxis = glm::normalize(point - position);

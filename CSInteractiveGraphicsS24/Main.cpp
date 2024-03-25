@@ -446,7 +446,7 @@ void SetUpLightBulb(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& sce
 	//Shared scene object
 	scene = std::make_shared<Scene>();
 
-	//Lab 7 Adding Crate with Normals
+	//Lab 7 Adding Lightbulb Object 
 
 	std::shared_ptr<Texture> LightbulbTex = std::make_shared<Texture>();
 	std::shared_ptr<GraphicsObject> LightbulbObj = std::make_shared<GraphicsObject>();
@@ -519,6 +519,5 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	glfw.staticAllocate();
 
 	glfw.Run3D();
-
 }
 

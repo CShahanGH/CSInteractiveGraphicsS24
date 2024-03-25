@@ -302,15 +302,13 @@ void GraphicsEnvironment::Run3D()
 	Timer timer;
 	double elapsedSeconds;
 
-	//Lab 6 Part 2.5 
+	//Lab 6 Part 2.5 Animation
 	//std::shared_ptr<RotateAnimation> rotateAnimation = std::make_shared<RotateAnimation>();
 	//rotateAnimation->SetObject(objectManager->GetObject("Crate"));
 	//objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
 
 	//Lab 7 
 	bool correctGamma = false;
-
-	objectManager->GetObject("Lightbulb")->SetPosition(GetRenderer("renderer")->GetScene()->GetLocalLight().position);
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -348,11 +346,7 @@ void GraphicsEnvironment::Run3D()
 		
 		//Set Local Light Position 
 		objectManager->GetObject("Lightbulb")->SetPosition(GetRenderer("renderer")->GetScene()->GetLocalLight().position);
-
-		// Make lightbulb face camera
-		glm::mat4 LightBulbReferenceFrame = objectManager->GetObject("Lightbulb")->GetReferenceFrame();
-		objectManager->GetObject("Lightbulb")->PointAt(LightBulbReferenceFrame, camera->GetPosition());
-		
+		objectManager->GetObject("Lightbulb")->PointAt(camera->GetPosition());
 
 		if (width >= height) {
 			aspectRatio = width / (height * 1.0f);

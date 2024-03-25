@@ -43,6 +43,6 @@ public:
 	void SetAnimation(std::shared_ptr<IAnimation> animation) { this->animation = animation; }
 	glm::mat4& GetLocalReferenceFrame() { return referenceFrame; }
 	Material& GetMaterial() { return material; } //Lab 7
-	void PointAt(glm::mat4& referenceFrame, const glm::vec3& point); //Lab 7
+	void PointAt(const glm::vec3& point); //Lab 7
 };
 
