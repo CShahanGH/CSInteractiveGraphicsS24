@@ -12,7 +12,7 @@ void Renderer::AllocateVertexBuffers(const std::vector<std::shared_ptr<GraphicsO
 	glBindVertexArray(this->vaoID);
 	for (auto & object : objects)
 	{
-		object->StaticAllocateVertexBuffer();
+		object->StaticAllocateBuffers();
 	}
 	glBindVertexArray(0);
 }
@@ -47,7 +47,9 @@ void Renderer::RenderScene(const Camera& camera)
 void Renderer::RenderObject(GraphicsObject& object)
 {
 	shader->SendMat4Uniform("world", object.GetReferenceFrame());
+
 	auto& buffer = object.GetVertexBuffer();
+
 	buffer->Select();
 
 	//Lab 4
@@ -62,7 +64,18 @@ void Renderer::RenderObject(GraphicsObject& object)
 	shader->SendFloatUniform("materialShininess", object.GetMaterial().shininess);
 
 	buffer->SetUpAttributeInterpretration();
-	glDrawArrays(buffer->GetPrimitiveType(), 0, buffer->GetNumberOfVertices());
+
+	if (object.IsIndexed())
+	{
+		auto& indexBuffer = object.GetIndexBuffer();
+		indexBuffer->Select();
+		int numberOfIndexes = indexBuffer->GetNumberOfIndexes();
+		glDrawElements(buffer->GetPrimitiveType(), numberOfIndexes, GL_UNSIGNED_SHORT, (void*)0);
+	}
+	else
+	{
+		glDrawArrays(buffer->GetPrimitiveType(), 0, buffer->GetNumberOfVertices());
+	}
 
 	// Recursively render the children
 	auto& children = object.GetChildren();

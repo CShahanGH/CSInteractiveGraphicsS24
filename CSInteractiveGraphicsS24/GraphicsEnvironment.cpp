@@ -369,6 +369,11 @@ void GraphicsEnvironment::Run3D()
 		GetRenderer("lightbulbrenderer")->SetProjection(projection);
 		GetRenderer("lightbulbrenderer")->RenderScene(*camera);
 
+		//Lab 8 Render the PC Objects
+		GetRenderer("pcobjectrenderer")->SetView(view);
+		GetRenderer("pcobjectrenderer")->SetProjection(projection);
+		GetRenderer("pcobjectrenderer")->RenderScene(*camera);
+
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();

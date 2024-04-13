@@ -253,3 +253,111 @@ std::shared_ptr<VertexBuffer> Generate::XZPlaneWithNormals(float width, float de
 
 	return buffer;
 }
+
+void Generate::XZLineCircle(std::shared_ptr<VertexBuffer>& buffer, float radius, glm::vec3 color, int steps)
+{
+	float x, z, thetaRadians;
+
+	for (float theta = 0; theta < 360; theta += steps) {
+		thetaRadians = glm::radians(theta);
+		x = radius * cosf(thetaRadians);
+		z = radius * sinf(thetaRadians);
+		buffer->AddVertexData(6, x, 0.0f, z, color.r, color.g, color.b);
+	}
+}
+
+void Generate::LineCircleIndexes(std::shared_ptr<IndexBuffer>& bufferToFill, int numberOfLineSegments, bool isClosed)
+{
+	unsigned short nextIndex;
+	if (!isClosed)
+	{
+		for (unsigned short index = 0; index < numberOfLineSegments - 1; index++) {
+			bufferToFill->AddIndexData(index);
+			nextIndex = index + 1;
+			bufferToFill->AddIndexData(nextIndex);
+		}
+	}
+	else
+	{
+		for (unsigned short index = 0; index < numberOfLineSegments; index++) {
+			bufferToFill->AddIndexData(index);
+			nextIndex = (index + 1) % static_cast<unsigned short>(numberOfLineSegments);
+			bufferToFill->AddIndexData(nextIndex);
+		}
+	}
+}
+
+void Generate::LineCylinder(std::shared_ptr<VertexBuffer>& buffer, float radius, float height, glm::vec3 color, int steps)
+{
+	float x, z, thetaRadians;
+	float posHalfHeight = height / 2;
+	float negHalfHeight = -posHalfHeight;
+
+	//Bottom Circle
+	for (float theta = 0; theta < 360; theta += steps) {
+		thetaRadians = glm::radians(theta);
+		x = radius * cosf(thetaRadians);
+		z = radius * sinf(thetaRadians);
+		buffer->AddVertexData(6, x, negHalfHeight, z, color.r, color.g, color.b);
+	}
+
+	//Top Circle
+	for (float theta = 0; theta < 360; theta += steps) {
+		thetaRadians = glm::radians(theta);
+		x = radius * cosf(thetaRadians);
+		z = radius * sinf(thetaRadians);
+		buffer->AddVertexData(6, x, posHalfHeight, z, color.r, color.g, color.b);
+	}
+}
+
+void Generate::LineCylinderIndexes(std::shared_ptr<IndexBuffer>& bufferToFill, int numberOfLineSegments)
+{
+	unsigned short topIndex;
+	unsigned short bottomIndex;
+	unsigned short nextTopIndex;
+	unsigned short nextBottomIndex;
+	unsigned short lineIndex;
+	unsigned short nextLineIndex;
+
+	//Bottom Circle
+	for (bottomIndex = 0; bottomIndex < numberOfLineSegments; bottomIndex++) 
+	{
+		bufferToFill->AddIndexData(bottomIndex);
+		nextBottomIndex = bottomIndex + 1;
+		if (nextBottomIndex == numberOfLineSegments) { nextBottomIndex = 0; }
+		bufferToFill->AddIndexData(nextBottomIndex);
+	}
+	//Top Circle
+	for (topIndex = numberOfLineSegments; topIndex < numberOfLineSegments*2; topIndex++)
+	{
+		bufferToFill->AddIndexData(topIndex);
+		nextTopIndex = topIndex + 1;
+		if (nextTopIndex == numberOfLineSegments*2) { nextTopIndex = numberOfLineSegments; }
+		bufferToFill->AddIndexData(nextTopIndex);
+	}
+	//Lines 
+	for (lineIndex = 0; lineIndex < numberOfLineSegments; lineIndex++)
+	{
+		bufferToFill->AddIndexData(lineIndex);
+		nextLineIndex = lineIndex + numberOfLineSegments;
+		bufferToFill->AddIndexData(nextLineIndex);
+	}
+	//One Loop Attempt Missing Last Top Circle Segment 
+	//for (bottomIndex = 0; bottomIndex < numberOfLineSegments; bottomIndex++)
+	//{
+	//	//Bottom Circle 
+	//	bufferToFill->AddIndexData(bottomIndex);
+	//	nextBottomIndex = bottomIndex + 1;
+	//	if (nextBottomIndex == numberOfLineSegments) { nextBottomIndex = 0; }
+	//	bufferToFill->AddIndexData(nextBottomIndex);
+	//	//Top Circle 
+	//	topIndex = bottomIndex + numberOfLineSegments;
+	//	bufferToFill->AddIndexData(topIndex);
+	//	nextTopIndex = topIndex + 1;
+	//	if (nextTopIndex == numberOfLineSegments*2) { nextTopIndex = bottomIndex + numberOfLineSegments; }
+	//	bufferToFill->AddIndexData(nextTopIndex);
+	//	//Lines
+	//	bufferToFill->AddIndexData(bottomIndex);
+	//	bufferToFill->AddIndexData(topIndex);
+	//}
+}

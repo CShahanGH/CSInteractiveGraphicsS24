@@ -28,13 +28,19 @@ void GraphicsObject::SetVertexBuffer(std::shared_ptr<VertexBuffer> buffer)
 	this->buffer = buffer;
 }
 
-void GraphicsObject::StaticAllocateVertexBuffer()
+void GraphicsObject::StaticAllocateBuffers()
 {
+	if (indexBuffer != nullptr)
+	{
+		indexBuffer->Select();
+		indexBuffer->StaticAllocate();
+		indexBuffer->Deselect();
+	}
 	buffer->Select();
 	buffer->StaticAllocate();
 	buffer->Deselect();
 	for (auto& child : children) {
-		child->StaticAllocateVertexBuffer();
+		child->StaticAllocateBuffers();
 	}
 }
 
@@ -83,6 +89,23 @@ void GraphicsObject::PointAt(const glm::vec3& point)
 	referenceFrame[0] = glm::vec4(xAxis, 0.0f);
 	referenceFrame[1] = glm::vec4(yAxis, 0.0f);
 	referenceFrame[2] = glm::vec4(zAxis, 0.0f);
+}
+
+void GraphicsObject::CreateIndexBuffer()
+{
+	indexBuffer = std::make_shared<IndexBuffer>();
+}
+
+bool GraphicsObject::IsIndexed() const
+{
+	if (indexBuffer != nullptr)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 

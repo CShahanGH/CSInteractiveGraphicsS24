@@ -470,6 +470,67 @@ void SetUpLightBulb(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& sce
 	graphicsenvironment.AddObject("Lightbulb", LightbulbObj);
 }
 
+//Lab 8 
+void SetUpPCObjectsScene(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
+{
+	//Read texture files and create a textureShader
+	TextFile vertextFile("basic.vert.glsl");
+	TextFile fragmentFile("basic.frag.glsl");
+	std::string vertexSource = vertextFile.GetData();
+	std::string fragmentSource = fragmentFile.GetData();
+	shader = std::make_shared<Shader>(vertexSource, fragmentSource);
+
+	//Add Unifroms
+	shader->AddUniform("projection");
+	shader->AddUniform("world");
+	shader->AddUniform("view");
+
+	//Shared scene object
+	scene = std::make_shared<Scene>();
+
+	//Lab 8 Adding Circle Object 
+
+	std::shared_ptr<GraphicsObject> pcLinesCircle = std::make_shared<GraphicsObject>();
+	pcLinesCircle->CreateIndexBuffer();
+	pcLinesCircle->CreateVertexBuffer(6);
+	auto& CircleIndexBuffer = pcLinesCircle->GetIndexBuffer();
+	auto& CircleVertexBuffer = pcLinesCircle->GetVertexBuffer();
+	CircleVertexBuffer->SetPrimitiveType(GL_LINES);
+
+	Generate::XZLineCircle(CircleVertexBuffer, 3.0f);
+	Generate::LineCircleIndexes(CircleIndexBuffer, 36); //360/Steps 
+
+	CircleVertexBuffer->AddVertexAttribute("position", 0, 3, 0);
+	CircleVertexBuffer->AddVertexAttribute("color", 1, 3, 3);
+
+	pcLinesCircle->SetPosition(glm::vec3(0.0f, 1.0f, 7.0f));
+
+	scene->AddObject(pcLinesCircle);
+
+	graphicsenvironment.AddObject("circle", pcLinesCircle);
+
+	//Lab 8 Adding Line Cylinder 
+	std::shared_ptr<GraphicsObject> pcLinesCylinder = std::make_shared<GraphicsObject>();
+	pcLinesCylinder->CreateIndexBuffer();
+	pcLinesCylinder->CreateVertexBuffer(6);
+	auto& CylinderIndexBuffer = pcLinesCylinder->GetIndexBuffer();
+	auto& CylinderVertexBuffer = pcLinesCylinder->GetVertexBuffer();
+	CylinderVertexBuffer->SetPrimitiveType(GL_LINES);
+
+	Generate::LineCylinder(CylinderVertexBuffer, 3.0f, 5.0f);
+	Generate::LineCylinderIndexes(CylinderIndexBuffer, 36); //360/Steps 
+
+	CylinderVertexBuffer->AddVertexAttribute("position", 0, 3, 0);
+	CylinderVertexBuffer->AddVertexAttribute("color", 1, 3, 3);
+
+	pcLinesCylinder->SetPosition(glm::vec3(10.0f, 4.0f, 7.0f));
+
+	scene->AddObject(pcLinesCylinder);
+
+	graphicsenvironment.AddObject("cylinder", pcLinesCylinder);
+
+}
+
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -490,16 +551,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	glfw.SetupGraphics();
 
-	//Lab 5 Part 2
-	std::shared_ptr<Shader> shader;
-	std::shared_ptr<Scene> scene;
-	//Lab 6
-	//SetUpScene1(shader, scene);
-	//SetUp3DScene1(shader, scene, glfw);
+	////Lab 5 Part 2
+	//std::shared_ptr<Shader> shader;
+	//std::shared_ptr<Scene> scene;
+	////Lab 6
+	////SetUpScene1(shader, scene);
+	////SetUp3DScene1(shader, scene, glfw);
 
-	std::shared_ptr<Shader> textureShader;
-	std::shared_ptr<Scene> textureScene;
-	//SetUpTexturedScene(textureShader, textureScene);
+	//std::shared_ptr<Shader> textureShader;
+	//std::shared_ptr<Scene> textureScene;
+	////SetUpTexturedScene(textureShader, textureScene);
 
 	//Lab 7
 	std::shared_ptr<Shader> shader2;
@@ -515,6 +576,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	SetUpLightBulb(lightbulbshader, lightbulbscene, glfw);
 	glfw.CreateRenderer("lightbulbrenderer", lightbulbshader);
 	glfw.GetRenderer("lightbulbrenderer")->SetScene(lightbulbscene);
+
+	//Lab 8 Circle 
+	std::shared_ptr<Shader> circleshader;
+	std::shared_ptr<Scene> circlescene;
+	SetUpPCObjectsScene(circleshader, circlescene, glfw);
+	glfw.CreateRenderer("pcobjectrenderer", circleshader);
+	glfw.GetRenderer("pcobjectrenderer")->SetScene(circlescene);
 
 	glfw.staticAllocate();
 
