@@ -4,6 +4,7 @@
 #include "ObjectManager.h"
 #include "Camera.h"
 #include "GraphicsStructures.h"
+#include "Ray.h"
 #include <string>
 
 #include <glad/glad.h> 
@@ -54,6 +55,8 @@ public:
 	void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
 
 	static void OnMouseMove(GLFWwindow* window, double mouseX, double mouseY);
+
+	Ray GetMouseRay(const glm::mat4& projection, const glm::mat4& view);
 };
 
 

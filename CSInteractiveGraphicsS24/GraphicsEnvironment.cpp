@@ -303,12 +303,17 @@ void GraphicsEnvironment::Run3D()
 	double elapsedSeconds;
 
 	//Lab 6 Part 2.5 Animation
-	//std::shared_ptr<RotateAnimation> rotateAnimation = std::make_shared<RotateAnimation>();
-	//rotateAnimation->SetObject(objectManager->GetObject("Crate"));
-	//objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
+	std::shared_ptr<RotateAnimation> rotateAnimation = std::make_shared<RotateAnimation>();
+	rotateAnimation->SetObject(objectManager->GetObject("Crate"));
+	objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
 
 	//Lab 7 
 	bool correctGamma = false;
+
+	//Lab 8 
+	Ray ray;
+	GeometricPlane plane;
+	Intersection intersection;
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -358,6 +363,17 @@ void GraphicsEnvironment::Run3D()
 			glm::radians(fieldOfView), aspectRatio, nearPlane, farPlane);
 
 		objectManager->Update(elapsedSeconds);
+
+		//Create a plane using the y value of the floor 
+		plane.SetDistanceFromOrigin(objectManager->GetObject("Plane")->GetReferenceFrame()[3].y);
+		//Get the mosue ray 
+		ray = GetMouseRay(projection, view);
+		//If mouse ray intersects if floor plane position the cylinder there 
+		intersection = ray.GetIntersectionWithPlane(plane);
+
+		if (intersection.isIntersecting) {
+			objectManager->GetObject("cylinder")->SetPosition(glm::vec3{ intersection.point.x, 4.0f, intersection.point.z });
+		}
 
 		// Render the scene (cuboid, crate, floor) 
 		GetRenderer("renderer")->SetView(view);
@@ -424,5 +440,12 @@ void GraphicsEnvironment::OnMouseMove(GLFWwindow* window, double mouseX, double 
 
 	self->mouse.nsx = xPercent * 2.0 - 1.0;
 	self->mouse.nsy = -(yPercent * 2.0 - 1.0);
+}
+
+Ray GraphicsEnvironment::GetMouseRay(const glm::mat4& projection, const glm::mat4& view)
+{
+	Ray ray;
+	ray.Create(self->mouse.nsx, self->mouse.nsy, projection, view);
+	return ray;
 }
 
