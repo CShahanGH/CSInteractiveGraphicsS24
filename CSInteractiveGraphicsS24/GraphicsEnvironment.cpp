@@ -421,5 +421,8 @@ void GraphicsEnvironment::OnMouseMove(GLFWwindow* window, double mouseX, double 
 
 	self->mouse.spherical.theta = 90.0f - (xPercent * 180); // left/right
 	self->mouse.spherical.phi = 180.0f - (yPercent * 180); // up/down
+
+	self->mouse.nsx = xPercent * 2.0 - 1.0;
+	self->mouse.nsy = -(yPercent * 2.0 - 1.0);
 }
 
