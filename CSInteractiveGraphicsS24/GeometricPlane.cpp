@@ -1,8 +1,15 @@
 #include "GeometricPlane.h"
 #include "GeometricLine.h"
+#include "Ray.h"
 
 GeometricPlane::GeometricPlane() : normal(0, 1, 0), distanceFromOrigin(0)
 {
+}
+
+void GeometricPlane::Set(glm::vec3 normal, float distance)
+{
+	SetIntersectionormal(normal);
+	SetDistanceFromOrigin(distance);
 }
 
 Intersection GeometricPlane::GetIntersectionWithLine(
@@ -18,4 +25,22 @@ Intersection GeometricPlane::GetIntersectionWithLine(
 	intersection.isIntersecting = true;
 	intersection.point = line.GetPosition(lambda);
 	return intersection;
+}
+
+float GeometricPlane::GetIntersectionOffset(const Ray& ray)
+{
+	float miss;
+	float offset;
+	float nRayProjection;
+	float nStartProjection;
+
+	miss = -1.0f;
+	offset = miss;
+
+	nRayProjection = glm::dot(normal, ray.GetDirection());
+	if (nRayProjection == 0) { return miss; } //They are perpendicular
+	nStartProjection = glm::dot(normal, ray.GetStart());
+	offset = -(nStartProjection + distanceFromOrigin) / nRayProjection;
+	// A negative value means the intersection offset is behind the start point
+	return offset;
 }

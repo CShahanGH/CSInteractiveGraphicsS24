@@ -5,6 +5,7 @@
 #include "VertexBuffer.h"
 #include "GraphicsStructures.h"
 #include "IndexBuffer.h"
+#include "BoundingBox.h"
 
 class GraphicsObject
 {
@@ -18,6 +19,8 @@ protected:
 	Material material;
 	//Lab 8 
 	std::shared_ptr<IndexBuffer> indexBuffer = nullptr;
+	//Lab 9
+	std::shared_ptr<BoundingBox> boundingBox = nullptr;
 
 public:
 	GraphicsObject();
@@ -51,5 +54,11 @@ public:
 	void CreateIndexBuffer(); //Lab 8
 	std::shared_ptr<IndexBuffer>& GetIndexBuffer() { return indexBuffer; }
 	bool IsIndexed() const;
+
+	void CreateBoundingBox(float width, float height, float depth); //lab 9
+	const BoundingBox& GetBoundingBox() const { return *boundingBox; }
+	bool IsIntersectingWithRay(const Ray& ray) const;
+
+	void SetAmbientIntensity(float ambientIntensity) { material.ambientIntensity = ambientIntensity; }
 };
 

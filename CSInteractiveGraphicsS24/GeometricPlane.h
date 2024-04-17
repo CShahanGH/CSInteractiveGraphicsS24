@@ -1,8 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
 
+class Ray;
 class GeometricLine;
-
 // Vince, J. (2014). Mathematics for Computer Graphics, Springer
 
 struct Intersection {
@@ -20,11 +20,13 @@ public:
 	GeometricPlane();
 	~GeometricPlane() = default;
 
-	void SetNormal(glm::vec3 normal) { this->normal = normal; }
+	void SetIntersectionormal(glm::vec3 normal) { this->normal = normal; }
 	void SetDistanceFromOrigin(float distance) {
 		distanceFromOrigin = fabs(distance);
 	}
+	void Set(glm::vec3 normal, float distance);
 
 	Intersection GetIntersectionWithLine(const GeometricLine& line) const;
+	float GetIntersectionOffset(const Ray& ray);
 };
 

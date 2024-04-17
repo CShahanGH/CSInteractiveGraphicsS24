@@ -59,7 +59,7 @@ void Renderer::RenderObject(GraphicsObject& object)
 		buffer->GetTexture()->SelectToRender(buffer->GetTextureUnit());
 	}
 
-	shader->SendFloatUniform("materialAmbientIntesnsity", object.GetMaterial().ambientIntensity);
+	shader->SendFloatUniform("materialAmbientIntensity", object.GetMaterial().ambientIntensity);
 	shader->SendFloatUniform("materialSpecularIntensity", object.GetMaterial().specularIntensity);
 	shader->SendFloatUniform("materialShininess", object.GetMaterial().shininess);
 

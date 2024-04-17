@@ -1,4 +1,5 @@
 #include "Ray.h"
+#include "GeometricLine.h"
 
 void Ray::Create(
 	float screenX, float screenY,

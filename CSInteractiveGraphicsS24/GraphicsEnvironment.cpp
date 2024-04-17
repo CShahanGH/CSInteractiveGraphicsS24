@@ -375,6 +375,26 @@ void GraphicsEnvironment::Run3D()
 			objectManager->GetObject("cylinder")->SetPosition(glm::vec3{ intersection.point.x, 4.0f, intersection.point.z });
 		}
 
+		//Lab 9 If the mouse ray intersectes with either the textured cube or the crate then 
+		//set their material ambient intensity to 1
+		auto cuboid = objectManager->GetObject("Cuboid");
+		if (cuboid->IsIntersectingWithRay(ray))
+		{
+			cuboid->SetAmbientIntensity(1.0f);
+		}
+		else
+		{
+			cuboid->SetAmbientIntensity(0.1f);
+		}
+		if (objectManager->GetObject("Crate")->IsIntersectingWithRay(ray))
+		{
+			objectManager->GetObject("Crate")->SetAmbientIntensity(1.0f);
+		}
+		else
+		{
+			objectManager->GetObject("Crate")->SetAmbientIntensity(0.1f);
+		}
+
 		// Render the scene (cuboid, crate, floor) 
 		GetRenderer("renderer")->SetView(view);
 		GetRenderer("renderer")->SetProjection(projection);

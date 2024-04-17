@@ -3,7 +3,7 @@
 
 GraphicsObject::GraphicsObject() : referenceFrame(1.0f), parent(nullptr), material{ 0.1f, 0.5f ,16.0f }
 {
-	
+	CreateBoundingBox(1.0f, 1.0f, 1.0f);
 }
 
 GraphicsObject::~GraphicsObject()
@@ -106,6 +106,19 @@ bool GraphicsObject::IsIndexed() const
 	{
 		return false;
 	}
+}
+
+void GraphicsObject::CreateBoundingBox(float width, float height, float depth)
+{
+	boundingBox = std::make_shared<BoundingBox>();
+	boundingBox->SetReferenceFrame(referenceFrame);
+	boundingBox->Create(width, height, depth);
+}
+
+bool GraphicsObject::IsIntersectingWithRay(const Ray& ray) const
+{
+	boundingBox->SetReferenceFrame(referenceFrame);
+	return boundingBox->isIntersectingWithRay(ray);
 }
 
 

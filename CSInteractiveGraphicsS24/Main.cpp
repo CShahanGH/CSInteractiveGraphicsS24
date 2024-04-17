@@ -371,7 +371,9 @@ void SetUp3DScene2(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 	cuboid->SetVertexBuffer(buffer);
 
 	//Set the object's position
-	cuboid->SetPosition(glm::vec3(0.0f, 2.501f, 0.0f));
+	cuboid->SetPosition(glm::vec3(0.0f, 2.50f, 0.0f));
+
+	cuboid->CreateBoundingBox(10.0f, 5.0f, 5.0f); //Lab 9
 
 	//Add object to the scene
 	scene->AddObject(cuboid);
@@ -397,6 +399,8 @@ void SetUp3DScene2(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 	crateObj->SetVertexBuffer(crateBuffer);
 
 	crateObj->SetPosition(glm::vec3(10.0f, 2.501f, -5.0f));
+
+	crateObj->CreateBoundingBox(5.0f, 5.0f, 5.0f);
 
 	scene->AddObject(crateObj);
 
