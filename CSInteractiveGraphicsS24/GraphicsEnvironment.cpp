@@ -386,13 +386,14 @@ void GraphicsEnvironment::Run3D()
 		{
 			cuboid->SetAmbientIntensity(0.1f);
 		}
-		if (objectManager->GetObject("Crate")->IsIntersectingWithRay(ray))
+		auto crate = objectManager->GetObject("Crate");
+		if (crate->IsIntersectingWithRay(ray))
 		{
-			objectManager->GetObject("Crate")->SetAmbientIntensity(1.0f);
+			crate->SetAmbientIntensity(1.0f);
 		}
 		else
 		{
-			objectManager->GetObject("Crate")->SetAmbientIntensity(0.1f);
+			crate->SetAmbientIntensity(0.1f);
 		}
 
 		// Render the scene (cuboid, crate, floor) 
