@@ -1,10 +1,11 @@
 #pragma once
 #include "BaseObject.h"
+#include "IBehavior.h"
 #include <memory>
 
 class GraphicsObject; //Forward declaration
 
-class IAnimation : public BaseObject
+class IAnimation : public IBehavior 
 {
 protected:
 	std::shared_ptr<GraphicsObject> object;

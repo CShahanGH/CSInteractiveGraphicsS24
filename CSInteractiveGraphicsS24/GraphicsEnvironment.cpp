@@ -8,6 +8,7 @@
 #include "Timer.h"
 #include "RotateAnimation.h"
 #include "ObjectManager.h"
+#include "MoveAnimation.h"
 
 GraphicsEnvironment* GraphicsEnvironment::self;
 
@@ -76,7 +77,8 @@ void GraphicsEnvironment::SetupGraphics()
 	glEnable(GL_MULTISAMPLE);
 
 	glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
-	glfwSetCursorPosCallback(window, OnMouseMove); //Can't use IMGUI 
+	glfwSetCursorPosCallback(window, OnMouseMove); 
+	glfwSetMouseButtonCallback(window, OnMouseClick);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -113,6 +115,8 @@ void GraphicsEnvironment::Render()
 		renderer->RenderScene(*camera);
 	}
 }
+
+
 
 void GraphicsEnvironment::ProcessInput(GLFWwindow* window, double elapsedSeconds, glm::mat4& view)
 {
@@ -307,13 +311,21 @@ void GraphicsEnvironment::Run3D()
 	rotateAnimation->SetObject(objectManager->GetObject("Crate"));
 	objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
 
+	//Lab 10 Animation
+	std::shared_ptr<MoveAnimation> moveAnimation = std::make_shared<MoveAnimation>();
+	moveAnimation->SetObject(objectManager->GetObject("Marble"));
+	objectManager->GetObject("Marble")->SetAnimation(moveAnimation);
+
 	//Lab 7 
 	bool correctGamma = false;
 
 	//Lab 8 
-	Ray ray;
+	//Ray ray;
 	GeometricPlane plane;
 	Intersection intersection;
+
+	//Lab 10
+	objectManager->SetBehaviorDefaults();
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -362,12 +374,23 @@ void GraphicsEnvironment::Run3D()
 		projection = glm::perspective(
 			glm::radians(fieldOfView), aspectRatio, nearPlane, farPlane);
 
+		//Get the mosue ray 
+		ray = GetMouseRay(projection, view);
+
+		//Lab 10
+		HighlightParams hp = { {}, &ray };
+		objectManager->GetObject("Cuboid")->
+			SetBehaviorParameters("highlight", hp);
+		objectManager->GetObject("Crate")->
+			SetBehaviorParameters("highlight", hp);
+		objectManager->GetObject("Marble")->
+			SetBehaviorParameters("highlight", hp);
+
 		objectManager->Update(elapsedSeconds);
 
 		//Create a plane using the y value of the floor 
 		plane.SetDistanceFromOrigin(objectManager->GetObject("Plane")->GetReferenceFrame()[3].y);
-		//Get the mosue ray 
-		ray = GetMouseRay(projection, view);
+
 		//If mouse ray intersects if floor plane position the cylinder there 
 		intersection = ray.GetIntersectionWithPlane(plane);
 
@@ -375,26 +398,26 @@ void GraphicsEnvironment::Run3D()
 			objectManager->GetObject("cylinder")->SetPosition(glm::vec3{ intersection.point.x, 4.0f, intersection.point.z });
 		}
 
-		//Lab 9 If the mouse ray intersectes with either the textured cube or the crate then 
-		//set their material ambient intensity to 1
-		auto cuboid = objectManager->GetObject("Cuboid");
-		if (cuboid->IsIntersectingWithRay(ray))
-		{
-			cuboid->SetAmbientIntensity(1.0f);
-		}
-		else
-		{
-			cuboid->SetAmbientIntensity(0.1f);
-		}
-		auto crate = objectManager->GetObject("Crate");
-		if (crate->IsIntersectingWithRay(ray))
-		{
-			crate->SetAmbientIntensity(1.0f);
-		}
-		else
-		{
-			crate->SetAmbientIntensity(0.1f);
-		}
+		////Lab 9 If the mouse ray intersectes with either the textured cube or the crate then 
+		////set their material ambient intensity to 1
+		//auto cuboid = objectManager->GetObject("Cuboid");
+		//if (cuboid->IsIntersectingWithRay(ray))
+		//{
+		//	cuboid->SetAmbientIntensity(1.0f);
+		//}
+		//else
+		//{
+		//	cuboid->SetAmbientIntensity(0.1f);
+		//}
+		//auto crate = objectManager->GetObject("Crate");
+		//if (crate->IsIntersectingWithRay(ray))
+		//{
+		//	crate->SetAmbientIntensity(1.0f);
+		//}
+		//else
+		//{
+		//	crate->SetAmbientIntensity(0.1f);
+		//}
 
 		// Render the scene (cuboid, crate, floor) 
 		GetRenderer("renderer")->SetView(view);
@@ -427,6 +450,7 @@ void GraphicsEnvironment::Run3D()
 		ImGui::SliderFloat("Local Intensity", &GetRenderer("renderer")->GetScene()->GetLocalLight().intensity, 0, 1);
 		ImGui::Checkbox("Correct gamma", &correctGamma);
 		ImGui::DragFloat3("Set Local Light Position", &GetRenderer("renderer")->GetScene()->GetLocalLight().position.x);
+		ImGui::Text("Clicked %s", isclicked.c_str());
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -461,6 +485,20 @@ void GraphicsEnvironment::OnMouseMove(GLFWwindow* window, double mouseX, double 
 
 	self->mouse.nsx = xPercent * 2.0 - 1.0;
 	self->mouse.nsy = -(yPercent * 2.0 - 1.0);
+}
+
+void GraphicsEnvironment::OnMouseClick(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	{
+		self->isclicked = "empty";
+		auto cuboid = self->objectManager->GetObject("Marble");
+		if (cuboid->IsIntersectingWithRay(self->ray))
+		{
+			self->isclicked = "marble clicked";
+			cuboid->ChangeMoving();
+		}
+	}
 }
 
 Ray GraphicsEnvironment::GetMouseRay(const glm::mat4& projection, const glm::mat4& view)

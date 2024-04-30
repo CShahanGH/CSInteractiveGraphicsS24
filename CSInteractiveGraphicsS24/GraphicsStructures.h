@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/trigonometric.hpp>
+#include "Ray.h"
 
 struct SphericalCoordinate {
     float phi = 0.0f, theta = 0.0f, rho = 1.0f;
@@ -47,4 +48,11 @@ struct Light {
     glm::vec3 color;
     float intensity;
     float attenuationCoef;
+};
+
+//Lab 10
+struct IParams{};
+
+struct HighlightParams : IParams {
+    Ray* ray;
 };

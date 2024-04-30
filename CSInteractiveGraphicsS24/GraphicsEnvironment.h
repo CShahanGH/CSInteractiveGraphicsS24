@@ -19,6 +19,8 @@ private:
 	std::shared_ptr<Camera> camera;
 	static GraphicsEnvironment* self; //Lab 6 Part 4
 	MouseParams mouse; 
+	std::string isclicked = "empty";
+	Ray ray;
 
 public: 
 	GraphicsEnvironment();
@@ -55,6 +57,8 @@ public:
 	void AddObject(const std::string& name, std::shared_ptr<GraphicsObject> object);
 
 	static void OnMouseMove(GLFWwindow* window, double mouseX, double mouseY);
+
+	static void OnMouseClick(GLFWwindow* window, int button, int action, int mods);
 
 	Ray GetMouseRay(const glm::mat4& projection, const glm::mat4& view);
 };

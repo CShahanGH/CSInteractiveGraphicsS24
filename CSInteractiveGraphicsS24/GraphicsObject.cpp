@@ -77,6 +77,10 @@ void GraphicsObject::Update(double elapsedSeconds)
 	{
 		animation->Update(elapsedSeconds);
 	}
+	for (const auto& [name, behavior] : behaviorMap)
+	{
+		behavior->Update(elapsedSeconds);
+	}
 }
 
 void GraphicsObject::PointAt(const glm::vec3& point)
@@ -119,6 +123,19 @@ bool GraphicsObject::IsIntersectingWithRay(const Ray& ray) const
 {
 	boundingBox->SetReferenceFrame(referenceFrame);
 	return boundingBox->isIntersectingWithRay(ray);
+}
+
+void GraphicsObject::SetBehaviorDefaults()
+{
+	for (const auto& [name, behavior] : behaviorMap)
+	{
+		behavior->StoreDefaults();
+	}
+}
+
+void GraphicsObject::SetBehaviorParameters(std::string name, IParams& params)
+{
+	behaviorMap[name]->SetParameter(params);
 }
 
 

@@ -17,5 +17,7 @@ public:
 
 	void Update(double elapsedSeconds);
 
+	void SetBehaviorDefaults();
+
 };
 

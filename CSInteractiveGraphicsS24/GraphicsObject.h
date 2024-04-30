@@ -6,6 +6,7 @@
 #include "GraphicsStructures.h"
 #include "IndexBuffer.h"
 #include "BoundingBox.h"
+#include "IBehavior.h"
 
 class GraphicsObject
 {
@@ -15,12 +16,11 @@ protected:
 	GraphicsObject* parent;
 	std::vector<std::shared_ptr<GraphicsObject>> children;
 	std::shared_ptr<IAnimation> animation = nullptr;
-	//Lab 7
 	Material material;
-	//Lab 8 
 	std::shared_ptr<IndexBuffer> indexBuffer = nullptr;
-	//Lab 9
 	std::shared_ptr<BoundingBox> boundingBox = nullptr;
+	std::unordered_map<std::string, std::shared_ptr<IBehavior>> behaviorMap;
+	bool moving = false;
 
 public:
 	GraphicsObject();
@@ -45,7 +45,7 @@ public:
 
 	void SetReferenceFrame(glm::mat4& referenceFrame) { this->referenceFrame = referenceFrame; } //Lab 5 Part  4
 
-	void Update(double elapsedSeconds); //Lab 6
+	void Update(double elapsedSeconds); //Lab 
 	void SetAnimation(std::shared_ptr<IAnimation> animation) { this->animation = animation; }
 	glm::mat4& GetLocalReferenceFrame() { return referenceFrame; }
 	Material& GetMaterial() { return material; } //Lab 7
@@ -60,5 +60,12 @@ public:
 	bool IsIntersectingWithRay(const Ray& ray) const;
 
 	void SetAmbientIntensity(float ambientIntensity) { material.ambientIntensity = ambientIntensity; }
+
+	void AddBehavior(std::string name, std::shared_ptr<IBehavior> behavior) { behaviorMap[name] = behavior; }
+	void SetBehaviorDefaults();
+	void SetBehaviorParameters(std::string name, IParams& params);
+
+	void ChangeMoving() { moving = !moving; }
+	bool Moving() const { return moving; }
 };
 

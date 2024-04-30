@@ -20,6 +20,7 @@
 #include "TextFile.h"
 #include "GraphicsEnvironment.h"
 #include "Generate.h"
+#include "HighlightBehavior.h"
 
 //Lab 4 
 static void SetUpTexturedScene(std::shared_ptr<Shader>& textureShader, std::shared_ptr<Scene>& textureScene)
@@ -375,6 +376,12 @@ void SetUp3DScene2(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 
 	cuboid->CreateBoundingBox(10.0f, 5.0f, 5.0f); //Lab 9
 
+	//Lab 10
+	auto cuboidHighlight = std::make_shared<HighlightBehavior>();
+	cuboidHighlight->SetObject(cuboid);
+
+	cuboid->AddBehavior("highlight", cuboidHighlight);
+
 	//Add object to the scene
 	scene->AddObject(cuboid);
 
@@ -402,15 +409,51 @@ void SetUp3DScene2(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 
 	crateObj->CreateBoundingBox(5.0f, 5.0f, 5.0f);
 
+	auto crateHighlight = std::make_shared<HighlightBehavior>();
+	crateHighlight->SetObject(crateObj);
+
+	crateObj->AddBehavior("highlight", crateHighlight);
+
 	scene->AddObject(crateObj);
 
 	graphicsenvironment.AddObject("Crate", crateObj);
+
+	//Lab 10 Adding a textured cuboid in the south east corner of the plane 
+	std::shared_ptr<Texture> Marble = std::make_shared<Texture>();
+	std::shared_ptr<GraphicsObject> MarbleObj = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> MarbleBuffer = Generate::CuboidWithNormals(5.0f, 5.0f, 5.0f);
+
+	Marble->LoadTextureDataFromFile("Marble.jpg");
+
+
+	MarbleBuffer->AddVertexAttribute("position", 0, 3, 0);
+	MarbleBuffer->AddVertexAttribute("color", 1, 4, 3);
+	MarbleBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	MarbleBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
+
+	MarbleBuffer->setTexture(Marble);
+
+	MarbleObj->SetVertexBuffer(MarbleBuffer);
+
+	MarbleObj->SetPosition(glm::vec3(15.0f, 2.501f, 15.0f));
+
+	MarbleObj->CreateBoundingBox(5.0f, 5.0f, 5.0f);
+
+	auto MarbleHighlight = std::make_shared<HighlightBehavior>();
+	MarbleHighlight->SetObject(MarbleObj);
+
+	MarbleObj->AddBehavior("highlight", MarbleHighlight);
+
+	scene->AddObject(MarbleObj);
+
+	graphicsenvironment.AddObject("Marble", MarbleObj);
+
 
 	//Lab 7 Adding Plane With Normals 
 	
 	std::shared_ptr<Texture> planeTex = std::make_shared<Texture>();
 	std::shared_ptr<GraphicsObject> plane = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> planeBuffer = Generate::XZPlaneWithNormals(15.0f, 15.0f);
+	std::shared_ptr<VertexBuffer> planeBuffer = Generate::XZPlaneWithNormals(30.0f, 30.0f);
 
 	planeTex->LoadTextureDataFromFile("cobblestone_floor_08_diff_1k.jpg");
 
