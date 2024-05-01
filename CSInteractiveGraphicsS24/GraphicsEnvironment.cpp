@@ -77,8 +77,8 @@ void GraphicsEnvironment::SetupGraphics()
 	glEnable(GL_MULTISAMPLE);
 
 	glfwSetFramebufferSizeCallback(window, OnWindowSizeChanged);
-	glfwSetCursorPosCallback(window, OnMouseMove); 
-	glfwSetMouseButtonCallback(window, OnButtonClick);
+	//glfwSetCursorPosCallback(window, OnMouseMove); 
+	//glfwSetMouseButtonCallback(window, OnButtonClick);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -175,80 +175,6 @@ glm::mat4 GraphicsEnvironment::CreateViewMatrix(const glm::vec3& position, const
 	return glm::inverse(view);
 }
 
-//void GraphicsEnvironment::Run2D()
-//{
-//	//Needed Lab 5 Part 2 1.43
-//	int width, height;
-//	glfwGetWindowSize(window, &width, &height);
-//	float aspectRatio = width / (height * 1.0f);
-//
-//	float left = -50.0f;
-//	float right = 50.0f;
-//	float bottom = -50.0f;
-//	float top = 50.0f;
-//	left *= aspectRatio;
-//	right *= aspectRatio;
-//	glm::mat4 projection = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
-//
-//	glm::vec3 clearColor = { 0.2f, 0.3f, 0.3f };
-//
-//	float angle = 0, childAngle = 0;
-//	float cameraX = -10, cameraY = 0;
-//	glm::mat4 view;
-//
-//	//Lab 5 Part 1
-//	ImGuiIO& io = ImGui::GetIO();
-//
-//	//Render Loop
-//	while (!glfwWindowShouldClose(window)) {
-//		//ProcessInput(window); Needs timer 
-//
-//		glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
-//		glClear(GL_COLOR_BUFFER_BIT);
-//
-//		view = CreateViewMatrix(
-//			glm::vec3(cameraX, cameraY, 1.0f),
-//			glm::vec3(0.0f, 0.0f, -1.0f),
-//			glm::vec3(0.0f, 1.0f, 0.0f)
-//		);
-//
-//		//Lab 5
-//		GetRenderer("renderer")->SetView(view);
-//		GetRenderer("renderer")->SetProjection(projection);
-//		GetRenderer("renderer")->RenderScene(*camera);
-//
-//		GetRenderer("textureRenderer")->SetView(view);
-//		GetRenderer("textureRenderer")->SetProjection(projection);
-//		GetRenderer("textureRenderer")->RenderScene(*camera);
-//
-//		ImGui_ImplOpenGL3_NewFrame();
-//		ImGui_ImplGlfw_NewFrame();
-//		ImGui::NewFrame();
-//		ImGui::Begin("Computing Interactive Graphics");
-//		ImGui::Text(GetRenderer("renderer")->GetShader()->GetLog().c_str()); //Needed?
-//		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-//			1000.0f / io.Framerate, io.Framerate);
-//		ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
-//		ImGui::SliderFloat("Angle", &angle, 0, 360);
-//		ImGui::SliderFloat("Child Angle", &childAngle, 0, 360);
-//		ImGui::SliderFloat("Camera X", &cameraX, left, right);
-//		ImGui::SliderFloat("Camera Y", &cameraY, bottom, top);
-//		ImGui::End();
-//		ImGui::Render();
-//		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-//
-//		glfwSwapBuffers(window);
-//		glfwPollEvents();
-//	}
-//
-//	ImGui_ImplOpenGL3_Shutdown();
-//	ImGui_ImplGlfw_Shutdown();
-//	ImGui::DestroyContext();
-//
-//	glfwTerminate();
-//	return; //Change int to void return type
-//}
-
 void GraphicsEnvironment::Run3D()
 {
 	int width, height;
@@ -260,47 +186,23 @@ void GraphicsEnvironment::Run3D()
 	float fieldOfView = 60;
 
 	//Camera Position
-	glm::vec3 startingPosition(0.0f, 5.0f, 0.0f);
+	glm::vec3 startingPosition(1.0f, 5.0f, 1.0f);
 	camera->SetPosition(startingPosition);
 	glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
-	//glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
-	glm::mat4 view = camera->LookForward(); //Lab7 set default view
+	glm::mat4 view = camera->LookForward();
 	glm::mat4 projection;
 	glm::mat4 referenceFrame(1.0f);
 	glm::vec3 clearColor = { 0.3f, 0.7f, 0.7f };
 
-	//Lab 5 Part 1
 	ImGuiIO& io = ImGui::GetIO();
 
-	//Lab 6
 	Timer timer;
 	double elapsedSeconds;
 
-	////Lab 6 Part 2.5 Animation
-	//std::shared_ptr<RotateAnimation> rotateAnimation = std::make_shared<RotateAnimation>();
-	//rotateAnimation->SetObject(objectManager->GetObject("Crate"));
-	//objectManager->GetObject("Crate")->SetAnimation(rotateAnimation);
-
-	////Lab 10 Animation
-	//std::shared_ptr<MoveAnimation> moveAnimation = std::make_shared<MoveAnimation>();
-	//moveAnimation->SetObject(objectManager->GetObject("Marble"));
-	//objectManager->GetObject("Marble")->SetAnimation(moveAnimation);
-
-	//Lab 7 
-	bool correctGamma = false;
-
-	//Lab 8 
-	//Ray ray;
-	GeometricPlane plane;
-	Intersection intersection;
-
-	//Lab 10
 	objectManager->SetBehaviorDefaults();
 
 	while (!glfwWindowShouldClose(window)) {
-
-		isIntersecting = "false";
 		elapsedSeconds = timer.GetElapsedTimeInSeconds();
 
 		ProcessInput(window, elapsedSeconds, view);
@@ -309,21 +211,28 @@ void GraphicsEnvironment::Run3D()
 		mouse.windowWidth = width;
 		mouse.windowHeight = height;
 
-		if (correctGamma)
-		{
-			glEnable(GL_FRAMEBUFFER_SRGB);
-		}
-		else
-		{
-			glDisable(GL_FRAMEBUFFER_SRGB);
-		}
-
 		glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		view = camera->LookForward();
+
+		//Day night cycle? 
+		Light& globallight = GetRenderer("level1renderer")->GetScene()->GetGlobalLight();
+		if (day)
+		{
+			globallight.intensity = globallight.intensity - 0.00001f;
+			if (globallight.intensity <= 0.1f)
+				day = false;
+		}
+		else
+		{
+			globallight.intensity = globallight.intensity + 0.00001f;
+			if (globallight.intensity >= 0.5f)
+				day = true;
+		}
 		
-		//Set Local Light Position 
+		
+		//Set Trophy Position 
 		objectManager->GetObject("Trophy")->SetPosition(GetRenderer("level1renderer")->GetScene()->GetTrophyLight().position);
 		objectManager->GetObject("Trophy")->PointAt(camera->GetPosition());
 
@@ -336,10 +245,7 @@ void GraphicsEnvironment::Run3D()
 		projection = glm::perspective(
 			glm::radians(fieldOfView), aspectRatio, nearPlane, farPlane);
 
-		//Get the mosue ray 
-		ray = GetMouseRay(projection, view);
-
-		//Falling Logic
+		//Make Camera Fall 
 		CheckCameraBox();
 		Falling(elapsedSeconds);
 		if (camera->GetPosition()[1] < -10.0f)
@@ -348,9 +254,6 @@ void GraphicsEnvironment::Run3D()
 		}
 
 		objectManager->Update(elapsedSeconds);
-
-		//Create a plane using the y value of the floor 
-		plane.SetDistanceFromOrigin(objectManager->GetObject("plane")->GetReferenceFrame()[3].y);
 
 		// Render the scene (cuboid, crate, floor) 
 		GetRenderer("level1renderer")->SetView(view);
@@ -362,24 +265,14 @@ void GraphicsEnvironment::Run3D()
 		GetRenderer("trophyrenderer")->SetProjection(projection);
 		GetRenderer("trophyrenderer")->RenderScene(*camera);
 
-		//IMGUI For Deubugging
-		
+		//IMGUI
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		ImGui::Begin("Computing Interactive Graphics");
-		ImGui::Text(GetRenderer("level1renderer")->GetShader()->GetLog().c_str());
+		ImGui::Text("Press 1 To Look North");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
 			1000.0f / io.Framerate, io.Framerate);
-		ImGui::Text("Elapsed seconds: %.3f", elapsedSeconds);
-		ImGui::Text("Camera Y Position: %.1f", camera->GetPosition()[1]); //Lab 6
-		ImGui::ColorEdit3("Background color", (float*)&clearColor.r);
-		ImGui::SliderFloat("Global Intensity", &GetRenderer("level1renderer")->GetScene()->GetGlobalLight().intensity, 0, 1);
-		ImGui::SliderFloat("Local Intensity", &GetRenderer("level1renderer")->GetScene()->GetLocalLight().intensity, 0, 1);
-		ImGui::Checkbox("Correct gamma", &correctGamma);
-		ImGui::DragFloat3("Set Local Light Position", &GetRenderer("level1renderer")->GetScene()->GetLocalLight().position.x);
-		ImGui::Text("Clicked %s", isclicked.c_str());
-		ImGui::Text("Intersecting %s", isIntersecting.c_str());
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -402,33 +295,6 @@ void GraphicsEnvironment::AddObject(const std::string& name, std::shared_ptr<Gra
 	objectManager->SetObject(name, object);
 }
 
-void GraphicsEnvironment::OnMouseMove(GLFWwindow* window, double mouseX, double mouseY)
-{
-	self->mouse.x = mouseX;
-	self->mouse.y = mouseY;
-
-	float xPercent = static_cast<float>(self->mouse.x / self->mouse.windowWidth);
-	float yPercent = static_cast<float>(self->mouse.y / self->mouse.windowHeight);
-
-	self->mouse.spherical.theta = 90.0f - (xPercent * 180); // left/right
-	self->mouse.spherical.phi = 180.0f - (yPercent * 180); // up/down
-
-	self->mouse.nsx = xPercent * 2.0 - 1.0;
-	self->mouse.nsy = -(yPercent * 2.0 - 1.0);
-}
-
-void GraphicsEnvironment::OnButtonClick(GLFWwindow* window, int button, int action, int mods)
-{
-
-}
-
-Ray GraphicsEnvironment::GetMouseRay(const glm::mat4& projection, const glm::mat4& view)
-{
-	Ray ray;
-	ray.Create(self->mouse.nsx, self->mouse.nsy, projection, view);
-	return ray;
-}
-
 void GraphicsEnvironment::CheckCameraBox()
 {
 	auto map = objectManager->GetMap();
@@ -436,10 +302,9 @@ void GraphicsEnvironment::CheckCameraBox()
 		if (camera->OverlapsWithObject(object))
 		{
 			playerFall = false;
-			isIntersecting = "true";
 			if (name == "Trophy")
 			{
-				camera->SetPosition(glm::vec3(0.0f, 0.5f, 0.0f));
+				camera->SetPosition(glm::vec3(1.0f, 0.5f, 1.0f));
 			}
 			return;
 

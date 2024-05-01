@@ -17,13 +17,12 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
 	std::shared_ptr<ObjectManager> objectManager;
 	std::shared_ptr<Camera> camera;
-	static GraphicsEnvironment* self; //Lab 6 Part 4
+	static GraphicsEnvironment* self;
 	MouseParams mouse; 
-	std::string isclicked = "empty";
-	std::string isIntersecting = "false";
 	Ray ray;
 	bool debugging = false; 
 	bool playerFall = true;
+	bool day = true;
 
 public: 
 	GraphicsEnvironment();

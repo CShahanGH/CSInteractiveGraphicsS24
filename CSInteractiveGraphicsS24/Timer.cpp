@@ -17,3 +17,4 @@ double Timer::GetElapsedTimeInSeconds()
 	startTime = std::chrono::high_resolution_clock::now();
 	return timeSpan.count();
 }
+
