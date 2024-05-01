@@ -324,8 +324,8 @@ void GraphicsEnvironment::Run3D()
 		view = camera->LookForward();
 		
 		//Set Local Light Position 
-		objectManager->GetObject("Lightbulb")->SetPosition(GetRenderer("level1renderer")->GetScene()->GetTrophyLight().position);
-		objectManager->GetObject("Lightbulb")->PointAt(camera->GetPosition());
+		objectManager->GetObject("Trophy")->SetPosition(GetRenderer("level1renderer")->GetScene()->GetTrophyLight().position);
+		objectManager->GetObject("Trophy")->PointAt(camera->GetPosition());
 
 		if (width >= height) {
 			aspectRatio = width / (height * 1.0f);
@@ -358,9 +358,9 @@ void GraphicsEnvironment::Run3D()
 		GetRenderer("level1renderer")->RenderScene(*camera);
 
 		//Lab 7 Render the lightbulb 
-		GetRenderer("lightbulbrenderer")->SetView(view);
-		GetRenderer("lightbulbrenderer")->SetProjection(projection);
-		GetRenderer("lightbulbrenderer")->RenderScene(*camera);
+		GetRenderer("trophyrenderer")->SetView(view);
+		GetRenderer("trophyrenderer")->SetProjection(projection);
+		GetRenderer("trophyrenderer")->RenderScene(*camera);
 
 		//IMGUI For Deubugging
 		
@@ -437,7 +437,12 @@ void GraphicsEnvironment::CheckCameraBox()
 		{
 			playerFall = false;
 			isIntersecting = "true";
+			if (name == "Trophy")
+			{
+				camera->SetPosition(glm::vec3(0.0f, 0.5f, 0.0f));
+			}
 			return;
+
 		}
 	}
 	playerFall = true;

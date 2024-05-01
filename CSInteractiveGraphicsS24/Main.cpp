@@ -188,7 +188,7 @@ void SetUp3DScene2(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 }
 
 //Used as refernece for creating a textured object
-void SetUpLightBulb(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
+void SetUpTrophy(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
 {
 	//Read texture files and create a textureShader
 	TextFile vertextFile("texture.vert.glsl");
@@ -208,26 +208,28 @@ void SetUpLightBulb(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& sce
 
 	//Lab 7 Adding Lightbulb Object 
 
-	std::shared_ptr<Texture> LightbulbTex = std::make_shared<Texture>();
-	std::shared_ptr<GraphicsObject> LightbulbObj = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> LightbulbBuffer = Generate::XYPlane(1.0f, 1.0f);
+	std::shared_ptr<Texture> TrophyTex = std::make_shared<Texture>();
+	std::shared_ptr<GraphicsObject> TrophyObj = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> TrophyBuffer = Generate::XYPlane(1.0f, 1.0f);
 
-	LightbulbTex->LoadTextureDataFromFile("lightbulb.png");
+	TrophyTex->LoadTextureDataFromFile("Trophy-Icon.png");
 
 
-	LightbulbBuffer->AddVertexAttribute("position", 0, 3, 0);
-	LightbulbBuffer->AddVertexAttribute("color", 1, 3, 3);
-	LightbulbBuffer->AddVertexAttribute("texCoord", 2, 2, 6);
+	TrophyBuffer->AddVertexAttribute("position", 0, 3, 0);
+	TrophyBuffer->AddVertexAttribute("color", 1, 3, 3);
+	TrophyBuffer->AddVertexAttribute("texCoord", 2, 2, 6);
 
-	LightbulbBuffer->setTexture(LightbulbTex);
+	TrophyBuffer->setTexture(TrophyTex);
 
-	LightbulbObj->SetVertexBuffer(LightbulbBuffer);
+	TrophyObj->SetVertexBuffer(TrophyBuffer);
 
-	LightbulbObj->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	TrophyObj->SetPosition(glm::vec3(0.0f, 60.0f, 0.0f));
 
-	scene->AddObject(LightbulbObj);
+	TrophyObj->CreateBoundingBox(5, 10, 5);
 
-	graphicsenvironment.AddObject("Lightbulb", LightbulbObj);
+	scene->AddObject(TrophyObj);
+
+	graphicsenvironment.AddObject("Trophy", TrophyObj);
 }
 
 //Level 1 Scene 
@@ -650,11 +652,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	glfw.GetRenderer("level1renderer")->SetScene(level1scene);
 	
 	//Lightbulb 
-	std::shared_ptr<Shader> lightbulbshader;
-	std::shared_ptr<Scene> lightbulbscene;
-	SetUpLightBulb(lightbulbshader, lightbulbscene, glfw);
-	glfw.CreateRenderer("lightbulbrenderer", lightbulbshader);
-	glfw.GetRenderer("lightbulbrenderer")->SetScene(lightbulbscene);
+	std::shared_ptr<Shader> trophyshader;
+	std::shared_ptr<Scene> trophyscene;
+	SetUpTrophy(trophyshader, trophyscene, glfw);
+	glfw.CreateRenderer("trophyrenderer", trophyshader);
+	glfw.GetRenderer("trophyrenderer")->SetScene(trophyscene);
 
 	glfw.staticAllocate();
 
