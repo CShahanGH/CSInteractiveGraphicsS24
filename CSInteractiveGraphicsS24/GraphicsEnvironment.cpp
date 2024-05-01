@@ -17,7 +17,6 @@ GraphicsEnvironment::GraphicsEnvironment()
 	window = 0;
 	objectManager = std::make_shared<ObjectManager>();
 	camera = std::make_shared<Camera>();
-	player = std::make_shared<GraphicsObject>();
 	self = this;
 }
 
@@ -258,7 +257,6 @@ void GraphicsEnvironment::Run3D()
 	//Camera Position
 	glm::vec3 startingPosition(0.0f, 5.0f, 0.0f);
 	camera->SetPosition(startingPosition);
-	UpdatePlayerPosition();
 	glm::vec3 cameraTarget(0.0f, 0.0f, 0.0f);
 	//glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
@@ -301,7 +299,6 @@ void GraphicsEnvironment::Run3D()
 		elapsedSeconds = timer.GetElapsedTimeInSeconds();
 
 		ProcessInput(window, elapsedSeconds, view);
-		UpdatePlayerPosition();
 		glfwGetWindowSize(window, &width, &height);
 
 		mouse.windowWidth = width;
@@ -343,7 +340,6 @@ void GraphicsEnvironment::Run3D()
 		if (camera->GetPosition()[1] < -10.0f)
 		{
 			camera->SetPosition(startingPosition);
-			UpdatePlayerPosition();
 		}
 
 		objectManager->Update(elapsedSeconds);
@@ -460,10 +456,5 @@ void GraphicsEnvironment::Jump(double elapsedSeconds)
 	{
 		camera->Jump(elapsedSeconds);
 	}
-}
-
-void GraphicsEnvironment::UpdatePlayerPosition()
-{
-	player->SetPosition(camera->GetPosition());
 }
 

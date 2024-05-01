@@ -17,7 +17,6 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
 	std::shared_ptr<ObjectManager> objectManager;
 	std::shared_ptr<Camera> camera;
-	std::shared_ptr<GraphicsObject> player;
 	static GraphicsEnvironment* self; //Lab 6 Part 4
 	MouseParams mouse; 
 	std::string isclicked = "empty";
@@ -71,8 +70,6 @@ public:
 	void Falling(double elapsedSeconds);
 
 	void Jump(double elapsedSeconds);
-
-	void UpdatePlayerPosition();
 };
 
 
