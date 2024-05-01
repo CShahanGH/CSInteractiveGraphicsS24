@@ -324,7 +324,7 @@ void GraphicsEnvironment::Run3D()
 		view = camera->LookForward();
 		
 		//Set Local Light Position 
-		objectManager->GetObject("Lightbulb")->SetPosition(GetRenderer("level1renderer")->GetScene()->GetLocalLight().position);
+		objectManager->GetObject("Lightbulb")->SetPosition(GetRenderer("level1renderer")->GetScene()->GetTrophyLight().position);
 		objectManager->GetObject("Lightbulb")->PointAt(camera->GetPosition());
 
 		if (width >= height) {
