@@ -140,17 +140,22 @@ void GraphicsEnvironment::ProcessInput(GLFWwindow* window, double elapsedSeconds
 		camera->RotateRight(elapsedSeconds);
 	}
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		camera->MoveUp(elapsedSeconds);
+		camera->RotateUp(elapsedSeconds);
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		camera->Jump(elapsedSeconds);
+		camera->RotateDown(elapsedSeconds);
 	}
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		Jump(elapsedSeconds);
+		Jump();
 	}
 	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS)
 	{
 		debugging = !debugging;
+	}
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
+		glm::mat4 lookframe(1.0f);
+		camera->SetLookFrame(lookframe);
 	}
 }
 
@@ -263,7 +268,7 @@ void GraphicsEnvironment::Run3D()
 	glm::mat4 view = camera->LookForward(); //Lab7 set default view
 	glm::mat4 projection;
 	glm::mat4 referenceFrame(1.0f);
-	glm::vec3 clearColor = { 0.2f, 0.3f, 0.3f };
+	glm::vec3 clearColor = { 0.3f, 0.7f, 0.7f };
 
 	//Lab 5 Part 1
 	ImGuiIO& io = ImGui::GetIO();
@@ -446,15 +451,12 @@ void GraphicsEnvironment::Falling(double elapsedSeconds)
 	}
 }
 
-void GraphicsEnvironment::Jump(double elapsedSeconds)
+void GraphicsEnvironment::Jump()
 {
 	if (playerFall)
 	{
 		return;
 	}
-	for (int i = 0; i < 3000; i++) //Jump 300 times 
-	{
-		camera->Jump(elapsedSeconds);
-	}
+	camera->Jump();
 }
 

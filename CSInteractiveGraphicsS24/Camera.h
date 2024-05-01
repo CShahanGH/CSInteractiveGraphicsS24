@@ -36,11 +36,13 @@ public:
 
 	void RotateLeft(double elapsedSeconds);
 	void RotateRight(double elapsedSeconds);
+	void RotateUp(double elapsedSeconds);
+	void RotateDown(double elapsedSeconds);
 
 	void MoveUp(double elapsedSeconds);
 
 	void FallDown(double elapsedSeconds);
-	void Jump(double elapsedSeconds);
+	void Jump();
 	
 	void ToggleMouse();
 

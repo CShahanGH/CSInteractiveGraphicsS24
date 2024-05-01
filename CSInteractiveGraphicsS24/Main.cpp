@@ -289,7 +289,7 @@ void SetUpLevel1Scene(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& s
 
 	graphicsenvironment.AddObject("plane", plane);
 
-	//First Crate Object
+	//Test Crate Object
 	std::shared_ptr<Texture> crateTex = std::make_shared<Texture>();
 	std::shared_ptr<GraphicsObject> crateObj = std::make_shared<GraphicsObject>();
 	std::shared_ptr<VertexBuffer> crateBuffer = Generate::CuboidWithNormals(5.0f, 5.0f, 5.0f);
@@ -313,6 +313,122 @@ void SetUpLevel1Scene(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& s
 	scene->AddObject(crateObj);
 
 	graphicsenvironment.AddObject("Crate", crateObj);
+
+	//cloud texture
+	std::shared_ptr<Texture> cloudTex = std::make_shared<Texture>();
+	cloudTex->LoadTextureDataFromFile("cloud.jpg");
+
+	//x-axis cloud buffer
+	std::shared_ptr<VertexBuffer> xCloudBuffer = Generate::CuboidWithNormals(10.0f, 2.0f, 5.0f);
+	xCloudBuffer->AddVertexAttribute("position", 0, 3, 0);
+	xCloudBuffer->AddVertexAttribute("color", 1, 4, 3);
+	xCloudBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	xCloudBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
+
+	xCloudBuffer->setTexture(cloudTex);
+
+	//z-axis cloud buffer
+	std::shared_ptr<VertexBuffer> zCloudBuffer = Generate::CuboidWithNormals(5.0f, 2.0f, 10.0f);
+	zCloudBuffer->AddVertexAttribute("position", 0, 3, 0);
+	zCloudBuffer->AddVertexAttribute("color", 1, 4, 3);
+	zCloudBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	zCloudBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
+
+	zCloudBuffer->setTexture(cloudTex);
+
+	//North
+	//First platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj1 = std::make_shared<GraphicsObject>();
+
+	cloudObj1->SetVertexBuffer(xCloudBuffer);
+
+	cloudObj1->SetPosition(glm::vec3(-5.0f, 2.50f, -35.0f));
+
+	cloudObj1->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+
+	scene->AddObject(cloudObj1);
+
+	graphicsenvironment.AddObject("Cloud1", cloudObj1);
+
+	//Second platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj2 = std::make_shared<GraphicsObject>();
+
+	cloudObj2->SetVertexBuffer(xCloudBuffer);
+
+	cloudObj2->SetPosition(glm::vec3(5.0f, 10.0f, -45.0f));
+
+	cloudObj2->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+
+	scene->AddObject(cloudObj2);
+
+	graphicsenvironment.AddObject("Cloud2", cloudObj2);
+
+	//Third platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj3 = std::make_shared<GraphicsObject>();
+
+	cloudObj3->SetVertexBuffer(xCloudBuffer);
+
+	cloudObj3->SetPosition(glm::vec3(10.0f, 15.0f, -40.0f));
+
+	cloudObj3->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+
+	scene->AddObject(cloudObj3);
+
+	graphicsenvironment.AddObject("Cloud3", cloudObj3);
+
+	//Fourth platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj4 = std::make_shared<GraphicsObject>();
+
+	cloudObj4->SetVertexBuffer(xCloudBuffer);
+
+	cloudObj4->SetPosition(glm::vec3(20.0f, 5.0f, -55.0f));
+
+	cloudObj4->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+
+	scene->AddObject(cloudObj4);
+
+	graphicsenvironment.AddObject("Cloud4", cloudObj4);
+
+	//Fifth platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj5 = std::make_shared<GraphicsObject>();
+
+	cloudObj5->SetVertexBuffer(xCloudBuffer);
+
+	cloudObj5->SetPosition(glm::vec3(30.0f, 10.0f, -50.0f));
+
+	cloudObj5->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+
+	scene->AddObject(cloudObj5);
+
+	graphicsenvironment.AddObject("Cloud5", cloudObj5);
+
+	//East
+	//Sixth platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj6 = std::make_shared<GraphicsObject>();
+
+	cloudObj6->SetVertexBuffer(zCloudBuffer);
+
+	cloudObj6->SetPosition(glm::vec3(40.0f, 15.0f, -35.0f));
+
+	cloudObj6->CreateBoundingBox(5.0f, 2.0f, 10.0f);
+
+	scene->AddObject(cloudObj6);
+
+	graphicsenvironment.AddObject("Cloud6", cloudObj6);
+
+	//Seventh platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj7 = std::make_shared<GraphicsObject>();
+
+	cloudObj7->SetVertexBuffer(zCloudBuffer);
+
+	cloudObj7->SetPosition(glm::vec3(45.0f, 5.0f, -15.0f));
+
+	cloudObj7->CreateBoundingBox(5.0f, 2.0f, 10.0f);
+
+	scene->AddObject(cloudObj7);
+
+	graphicsenvironment.AddObject("Cloud7", cloudObj7);
+
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,

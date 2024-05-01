@@ -205,6 +205,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="base_grass_detail_S.png" />
+    <Image Include="cloud.jpg" />
     <Image Include="cobblestone_floor_08_diff_1k.jpg" />
     <Image Include="lightbulb.png" />
     <Image Include="Marble.jpg" />

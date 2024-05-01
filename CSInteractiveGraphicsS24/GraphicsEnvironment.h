@@ -69,7 +69,7 @@ public:
 
 	void Falling(double elapsedSeconds);
 
-	void Jump(double elapsedSeconds);
+	void Jump();
 };
 
 

@@ -59,7 +59,7 @@ void Camera::RotateLeft(double elapsedSeconds)
 {
 	float speed = 60.0f;
 	float deltaSpeed = static_cast<float>(speed * elapsedSeconds);
-	lookframe = glm::rotate(lookframe, glm::radians(deltaSpeed), { 0, 1, 0 });
+	lookframe = glm::rotate(lookframe, glm::radians(deltaSpeed), {0, 1, 0});
 }
 
 void Camera::RotateRight(double elapsedSeconds)
@@ -67,6 +67,20 @@ void Camera::RotateRight(double elapsedSeconds)
 	float speed = -60.0f;
 	float deltaSpeed = static_cast<float>(speed * elapsedSeconds);
 	lookframe = glm::rotate(lookframe, glm::radians(deltaSpeed), { 0, 1, 0 });
+}
+
+void Camera::RotateUp(double elapsedSeconds)
+{
+	float speed = -60.0f;
+	float deltaSpeed = static_cast<float>(speed * elapsedSeconds);
+	lookframe = glm::rotate(lookframe, glm::radians(deltaSpeed), { -1, 0, 0 });
+}
+
+void Camera::RotateDown(double elapsedSeconds)
+{
+	float speed = -60.0f;
+	float deltaSpeed = static_cast<float>(speed * elapsedSeconds);
+	lookframe = glm::rotate(lookframe, glm::radians(deltaSpeed), { 1, 0, 0 });
 }
 
 void Camera::MoveUp(double elapsedSeconds)
@@ -90,13 +104,12 @@ void Camera::FallDown(double elapsedSeconds)
 	return;
 }
 
-void Camera::Jump(double elapsedSeconds)
+void Camera::Jump()
 {
 	glm::vec3 moveup = referenceframe[1];
 	glm::vec3 position = referenceframe[3];
-	float jumpspeed = 100.0f; 
-	float deltaspeed = static_cast<float>(jumpspeed * elapsedSeconds);
-	moveup = moveup * deltaspeed;
+	float jumppower = 10.0f;
+	moveup = moveup * jumppower;
 	position = position + moveup;
 	referenceframe[3] = glm::vec4(position, 1.0f);
 	return;
