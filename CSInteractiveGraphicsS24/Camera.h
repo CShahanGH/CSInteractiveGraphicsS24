@@ -3,6 +3,9 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include "BoundingBox.h"
+#include "GraphicsObject.h"
+#include <memory>
 
 class Camera
 {
@@ -10,7 +13,8 @@ private:
 	glm::mat4 lookframe; 
 	glm::mat4 referenceframe; 
 	float movespeed = 10.0f;
-	bool lookwithmouse = false; //lab 7
+	bool lookwithmouse = true; 
+	std::shared_ptr<BoundingBox> boundingBox = nullptr;
 
 		
 public: 
@@ -29,16 +33,23 @@ public:
 	void MoveBackward(double elapsedSeconds);
 	void MoveLeft(double elapsedSeconds);
 	void MoveRight(double elapsedSeconds);
+
+	void RotateLeft(double elapsedSeconds);
+	void RotateRight(double elapsedSeconds);
+
 	void MoveUp(double elapsedSeconds);
-	void MoveDown(double elapsedSeconds);
+
+	void FallDown(double elapsedSeconds);
+	void Jump(double elapsedSeconds);
 	
 	void ToggleMouse();
 
 	glm::mat4 LookForward();
-	//Lab 7 
-	glm::mat4 LookRight();
-	glm::mat4 LookLeft();
-	glm::mat4 LookBehind();
+	
+	void CreateBoundingBox(float width, float height, float depth); 
+	const BoundingBox& GetBoundingBox() const { return *boundingBox; }
+
+	bool OverlapsWithObject(const std::shared_ptr<GraphicsObject>& object);
 
 	glm::mat4 LookAt(glm::vec3 cameraTarget);
 };

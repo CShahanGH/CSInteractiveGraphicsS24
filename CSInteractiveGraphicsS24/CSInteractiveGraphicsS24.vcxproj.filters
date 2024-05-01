@@ -102,6 +102,9 @@
     <ClInclude Include="MoveAnimation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="JumpAnimation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\3rdparty\glad\src\glad.c">
@@ -199,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="MoveAnimation.cpp">
       <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="JumpAnimation.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

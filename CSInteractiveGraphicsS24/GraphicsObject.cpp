@@ -138,5 +138,12 @@ void GraphicsObject::SetBehaviorParameters(std::string name, IParams& params)
 	behaviorMap[name]->SetParameter(params);
 }
 
+bool GraphicsObject::hasBoundingBox()
+{
+	if(boundingBox != nullptr)
+		return true;
+	return false;
+}
+
 
 

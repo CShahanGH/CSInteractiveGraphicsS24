@@ -55,7 +55,7 @@ public:
 	std::shared_ptr<IndexBuffer>& GetIndexBuffer() { return indexBuffer; }
 	bool IsIndexed() const;
 
-	void CreateBoundingBox(float width, float height, float depth); //lab 9
+	void CreateBoundingBox(float width, float height, float depth); 
 	const BoundingBox& GetBoundingBox() const { return *boundingBox; }
 	bool IsIntersectingWithRay(const Ray& ray) const;
 
@@ -67,5 +67,8 @@ public:
 
 	void ChangeMoving() { moving = !moving; }
 	bool Moving() const { return moving; }
+
+	bool hasBoundingBox();
+	void setBoundingBoxFrame() { boundingBox->SetReferenceFrame(referenceFrame); }
 };
 
