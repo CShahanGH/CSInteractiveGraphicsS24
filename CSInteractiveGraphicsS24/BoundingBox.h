@@ -4,6 +4,11 @@
 #include <vector>
 #include "Ray.h"
 
+struct MinMax {
+	float min = 0.0f;
+	float max = 0.0f;
+};
+
 class BoundingBox
 {
 public:
@@ -32,6 +37,9 @@ public:
 	const glm::vec3& GetIntersectionPoint() const { return intersectionPoint; }
 	void Create(float width, float height, float depth);
 	bool isIntersectingWithRay(const Ray& ray);
+	MinMax GetMinMaxProjection(const glm::vec3& axis) const;
+	bool OverLapsWith(const BoundingBox& other) const;
+	bool OnTopOf(const BoundingBox& other) const;
 };
 
 

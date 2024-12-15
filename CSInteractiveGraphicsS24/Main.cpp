@@ -22,161 +22,9 @@
 #include "Generate.h"
 #include "HighlightBehavior.h"
 
-//Lab 4 
-static void SetUpTexturedScene(std::shared_ptr<Shader>& textureShader, std::shared_ptr<Scene>& textureScene)
-{
-	//Read texture files and create a textureShader
-	TextFile vertextFile("texture.vert.glsl");
-	TextFile fragmentFile("texture.frag.glsl");
-	std::string vertexSource = vertextFile.GetData();
-	std::string fragmentSource = fragmentFile.GetData();
-	textureShader = std::make_shared<Shader>(vertexSource, fragmentSource);
 
-	//Add Unifroms
-	textureShader->AddUniform("projection");
-	textureShader->AddUniform("world");
-	textureShader->AddUniform("view");
-	textureShader->AddUniform("textUnit");
-
-	//Create a new shared texture 
-	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
-
-	//Set width and height to 4 
-	texture->setHeight(4);
-	texture->setWidth(4);
-	
-	//Set the texture data 
-	unsigned char* textureData = new unsigned char[] {
-			255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 255, 255, 255, 255,
-			0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
-			0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
-			255, 255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 255, 255, 255,
-	};
-
-	texture->setTextureData(64, textureData);
-	
-	//Part 8
-	texture->setwrapS(GL_CLAMP_TO_EDGE);
-	texture->setwrapT(GL_CLAMP_TO_EDGE);
-	texture->setmagFilter(GL_LINEAR);
-
-	//Shared scene object
-	textureScene = std::make_shared<Scene>();
-
-	//Shared graphics object 
-	std::shared_ptr<GraphicsObject> object = std::make_shared<GraphicsObject>();
-
-	//Shared VertexBuffer
-	std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(8);
-
-	//Add Vertex Data
-	buffer->AddVertexData(8, -20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 3.0f);
-	buffer->AddVertexData(8, -20.0f, -20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
-	buffer->AddVertexData(8, 20.0f, -20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 3.0f, 0.0f);
-	buffer->AddVertexData(8, -20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 3.0f);
-	buffer->AddVertexData(8, 20.0f, -20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 3.0f, 0.0f);
-	buffer->AddVertexData(8, 20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 3.0f, 3.0f);
-
-	//Add vertex attributes
-	buffer->AddVertexAttribute("position", 0, 3, 0);
-	buffer->AddVertexAttribute("color", 1, 3, 3);
-	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
-	
-	//Set the buffer's texture
-	buffer->setTexture(texture);
-
-	//Set the object's buffer
-	object->SetVertexBuffer(buffer);
-
-	//Set the object's position
-	object->SetPosition(glm::vec3(-35.0f, -20.0f, 0.0f));
-
-	//Add object to the scene
-	textureScene->AddObject(object);
-
-	//Part 7 
-	
-	std::shared_ptr<Texture> texture2 = std::make_shared<Texture>();
-	std::shared_ptr<GraphicsObject> object2 = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> buffer2 = std::make_shared<VertexBuffer>(8);
-
-	texture2->LoadTextureDataFromFile("base_grass_detail_S.png");
-
-	buffer2->AddVertexData(8, -20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
-	buffer2->AddVertexData(8, -20.0f, -20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
-	buffer2->AddVertexData(8, 20.0f, -20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
-	buffer2->AddVertexData(8, -20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
-	buffer2->AddVertexData(8, 20.0f, -20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
-	buffer2->AddVertexData(8, 20.0f, 20.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
-
-	buffer2->AddVertexAttribute("position", 0, 3, 0);
-	buffer2->AddVertexAttribute("color", 1, 3, 3);
-	buffer2->AddVertexAttribute("texCoord", 2, 2, 6);
-
-	buffer2->setTexture(texture2);
-
-	object2->SetVertexBuffer(buffer2);
-
-	object2->SetPosition(glm::vec3(35.0f, 30.0f, 0.0f));
-
-	textureScene->AddObject(object2);
-}
-
-//Lab 5
-void SetUpScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene)
-{
-	//Read text files 
-	TextFile vertextFile("basic.vert.glsl");
-	TextFile fragmentFile("basic.frag.glsl");
-	std::string vertexSource = vertextFile.GetData();
-	std::string fragmentSource = fragmentFile.GetData();
-	shader = std::make_shared<Shader>(vertexSource, fragmentSource);
-
-	//Add Uniforms
-	shader->AddUniform("projection");
-	shader->AddUniform("world");
-	shader->AddUniform("view");
-
-	scene = std::make_shared<Scene>();
-
-	std::shared_ptr<GraphicsObject> square = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> buffer = std::make_shared<VertexBuffer>(6);
-	buffer->AddVertexData(6, -5.0f, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-	buffer->AddVertexData(6, -5.0f, -5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-	buffer->AddVertexData(6, 5.0f, -5.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-	buffer->AddVertexData(6, -5.0f, 5.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	buffer->AddVertexData(6, 5.0f, -5.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	buffer->AddVertexData(6, 5.0f, 5.0f, 0.0f, 0.0f, 0.0f, 1.0f);
-	buffer->AddVertexAttribute("position", 0, 3);
-	buffer->AddVertexAttribute("color", 1, 3, 3);
-	square->SetVertexBuffer(buffer);
-	scene->AddObject(square);
-
-	std::shared_ptr<GraphicsObject> triangle = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> buffer2 = std::make_shared<VertexBuffer>(6);
-	buffer2->AddVertexData(6, -5.0f, 5.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	buffer2->AddVertexData(6, -5.0f, -5.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	buffer2->AddVertexData(6, 5.0f, -5.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	buffer2->AddVertexAttribute("position", 0, 3);
-	buffer2->AddVertexAttribute("color", 1, 3, 3);
-	triangle->SetVertexBuffer(buffer2);
-	triangle->SetPosition(glm::vec3(30.0f, 0.0f, 0.0f));
-	scene->AddObject(triangle);
-
-	std::shared_ptr<GraphicsObject> line = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> buffer3 = std::make_shared<VertexBuffer>(6);
-	buffer3->SetPrimitiveType(GL_LINES);
-	buffer3->AddVertexData(6, 0.0f, 2.5f, 0.0f, 0.0f, 1.0f, 0.0f);
-	buffer3->AddVertexData(6, 0.0f, -2.5f, 0.0f, 0.0f, 1.0f, 0.0f);
-	buffer3->AddVertexAttribute("position", 0, 3);
-	buffer3->AddVertexAttribute("color", 1, 3, 3);
-	line->SetVertexBuffer(buffer3);
-	line->SetPosition(glm::vec3(5.0f, -10.0f, 0.0f));
-	triangle->AddChild(line);
-}
-
-//Lab 6 Part 1.6 
-void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
+//Sets up a textured cube of a trophy
+void SetUpTrophy(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
 {
 	//Read texture files and create a textureShader
 	TextFile vertextFile("texture.vert.glsl");
@@ -184,133 +32,49 @@ void SetUp3DScene1(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 	std::string vertexSource = vertextFile.GetData();
 	std::string fragmentSource = fragmentFile.GetData();
 	shader = std::make_shared<Shader>(vertexSource, fragmentSource);
-		
+
 	//Add Unifroms
 	shader->AddUniform("projection");
 	shader->AddUniform("world");
 	shader->AddUniform("view");
 	shader->AddUniform("textUnit");
 
-	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
-
-	texture->setHeight(4);
-	texture->setWidth(4);
-
-	// Create the texture data
-	unsigned char* textureData = new unsigned char[] {
-			0, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 0, 255,
-			0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
-			0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
-			0, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 0, 255
-	};
-
-	texture->setTextureData(64, textureData);
-
 	//Shared scene object
 	scene = std::make_shared<Scene>();
 
-	//Shared graphics object 
-	std::shared_ptr<GraphicsObject> cuboid = std::make_shared<GraphicsObject>();
+	//Lab 7 Adding Lightbulb Object 
 
-	//Shared VertexBuffer
-	std::shared_ptr<VertexBuffer> buffer = Generate::Cuboid(10.0f, 5.0f, 5.0f);
+	std::shared_ptr<Texture> TrophyTex = std::make_shared<Texture>();
+	std::shared_ptr<GraphicsObject> TrophyObj = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> TrophyBuffer = Generate::XYPlane(1.0f, 1.0f);
 
-	/*
-		A - 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
-		B - 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
-		C 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
-		D 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-
-		E 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
-		F 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
-		G 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
-		H 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-
-		I 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
-		J 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
-		K - 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
-		L - 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-
-		M - 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
-		N - 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
-		O - 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
-		P - 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-
-		Q - 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
-		R - 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
-		S 5.0f, 5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
-		T 5.0f, 5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-
-		U 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
-		V 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f
-		W - 5.0f, -5.0f, -5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
-		X - 5.0f, -5.0f, 5.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
-	*/
-
-	buffer->AddVertexAttribute("position", 0, 3, 0);
-	buffer->AddVertexAttribute("color", 1, 3, 3);
-	buffer->AddVertexAttribute("texCoord", 2, 2, 6);
-
-	//Set the buffer's texture
-	buffer->setTexture(texture);
-
-	//Set the object's buffer
-	cuboid->SetVertexBuffer(buffer);
-
-	//Set the object's position
-	cuboid->SetPosition(glm::vec3(0.0f, 2.501f, 0.0f));
-
-	//Add object to the scene
-	scene->AddObject(cuboid);
-
-	graphicsenvironment.AddObject("Cuboid", cuboid);
-
-	//Lab 5 Part 6
-	std::shared_ptr<Texture> crateTex = std::make_shared<Texture>();
-	std::shared_ptr<GraphicsObject> crateObj = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> crateBuffer = Generate::Cuboid(5.0f, 5.0f, 5.0f);
-
-	crateTex->LoadTextureDataFromFile("Wooden Crate Texture.png");
+	TrophyTex->LoadTextureDataFromFile("Trophy-Icon.png");
 
 
-	crateBuffer->AddVertexAttribute("position", 0, 3, 0);
-	crateBuffer->AddVertexAttribute("color", 1, 3, 3);
-	crateBuffer->AddVertexAttribute("texCoord", 2, 2, 6);
+	TrophyBuffer->AddVertexAttribute("position", 0, 3, 0);
+	TrophyBuffer->AddVertexAttribute("color", 1, 3, 3);
+	TrophyBuffer->AddVertexAttribute("texCoord", 2, 2, 6);
 
-	crateBuffer->setTexture(crateTex);
+	TrophyBuffer->setTexture(TrophyTex);
 
-	crateObj->SetVertexBuffer(crateBuffer);
+	TrophyObj->SetVertexBuffer(TrophyBuffer);
 
-	crateObj->SetPosition(glm::vec3(10.0f, 2.501f, -5.0f));
+	TrophyObj->SetPosition(glm::vec3(0.0f, 60.0f, 0.0f));
 
-	scene->AddObject(crateObj);
+	TrophyObj->CreateBoundingBox(5, 10, 5);
 
-	graphicsenvironment.AddObject("Crate", crateObj);
+	scene->AddObject(TrophyObj);
 
-	//Lab 5 Part 7 adding a PLane 
-	std::shared_ptr<Texture> planeTex = std::make_shared<Texture>();
-	std::shared_ptr<GraphicsObject> plane = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> planeBuffer = Generate::XZPlane(15.0f, 15.0f);
-
-	planeTex->LoadTextureDataFromFile("cobblestone_floor_08_diff_1k.jpg");
-
-	planeBuffer->AddVertexAttribute("position", 0, 3, 0);
-	planeBuffer->AddVertexAttribute("color", 1, 3, 3);
-	planeBuffer->AddVertexAttribute("texCoord", 2, 2, 6);
-
-	planeBuffer->setTexture(planeTex);
-
-	plane->SetVertexBuffer(planeBuffer);
-
-	plane->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-
-	scene->AddObject(plane);
-
-	graphicsenvironment.AddObject("Plane", plane);
+	graphicsenvironment.AddObject("Trophy", TrophyObj);
 }
 
-//Lab 7
-void SetUp3DScene2(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
+//Level 1 Scene 
+/*
+  The goal of level 1 is to touch the red cube
+  The player starts on the blue cube
+  The method SetUpLevel1Scene scene generates a 3d scene of planes and cubes used in the 1st level
+*/
+void SetUpLevel1Scene(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
 {
 	//Read texture files and create a textureShader
 	TextFile vertextFile("lighting.vert.glsl");
@@ -336,65 +100,34 @@ void SetUp3DScene2(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 	shader->AddUniform("localLightAttenuationCoef");
 	shader->AddUniform("viewPosition");
 
-	std::shared_ptr<Texture> texture = std::make_shared<Texture>();
-
-	texture->setHeight(4);
-	texture->setWidth(4);
-
-	// Create the texture data
-	unsigned char* textureData = new unsigned char[] {
-		0, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 0, 255,
-			0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
-			0, 255, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 255, 0, 255,
-			0, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 0, 255
-		};
-
-	texture->setTextureData(64, textureData);
-
 	//Shared scene object
 	scene = std::make_shared<Scene>();
 
-	//Shared graphics object 
-	std::shared_ptr<GraphicsObject> cuboid = std::make_shared<GraphicsObject>();
+	//Adding a plane with normals for the starting floor 
+	std::shared_ptr<Texture> floorTex = std::make_shared<Texture>();
+	std::shared_ptr<GraphicsObject> plane = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> planeBuffer = Generate::XZPlaneWithNormals(30.0f, 30.0f);
 
-	//Shared VertexBuffer
-	std::shared_ptr<VertexBuffer> buffer = Generate::CuboidWithNormals(10.0f, 5.0f, 5.0f); // Lab 7 3.3?
+	floorTex->LoadTextureDataFromFile("cobblestone_floor_08_diff_1k.jpg");
 
-	buffer->AddVertexAttribute("position", 0, 3, 0);
-	buffer->AddVertexAttribute("vertexColor", 1, 4, 3);
-	buffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
-	buffer->AddVertexAttribute("texCoord", 3, 2, 10);
+	planeBuffer->AddVertexAttribute("position", 0, 3, 0);
+	planeBuffer->AddVertexAttribute("color", 1, 4, 3);
+	planeBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	planeBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
 
-	//Set the buffer's texture
-	buffer->setTexture(texture);
+	planeBuffer->setTexture(floorTex);
+	plane->SetVertexBuffer(planeBuffer);
+	plane->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	plane->CreateBoundingBox(60.0f, 0.0f, 60.0f);
+	scene->AddObject(plane);
+	graphicsenvironment.AddObject("plane", plane);
 
-	//Set the object's buffer
-	cuboid->SetVertexBuffer(buffer);
-
-	//Set the object's position
-	cuboid->SetPosition(glm::vec3(0.0f, 2.50f, 0.0f));
-
-	cuboid->CreateBoundingBox(10.0f, 5.0f, 5.0f); //Lab 9
-
-	//Lab 10
-	auto cuboidHighlight = std::make_shared<HighlightBehavior>();
-	cuboidHighlight->SetObject(cuboid);
-
-	cuboid->AddBehavior("highlight", cuboidHighlight);
-
-	//Add object to the scene
-	scene->AddObject(cuboid);
-
-	graphicsenvironment.AddObject("Cuboid", cuboid);
-
-	//Lab 7 Adding Crate with Normals
-
+	//Test Crate Object
 	std::shared_ptr<Texture> crateTex = std::make_shared<Texture>();
 	std::shared_ptr<GraphicsObject> crateObj = std::make_shared<GraphicsObject>();
 	std::shared_ptr<VertexBuffer> crateBuffer = Generate::CuboidWithNormals(5.0f, 5.0f, 5.0f);
 
 	crateTex->LoadTextureDataFromFile("Wooden Crate Texture.png");
-
 
 	crateBuffer->AddVertexAttribute("position", 0, 3, 0);
 	crateBuffer->AddVertexAttribute("color", 1, 4, 3);
@@ -402,183 +135,213 @@ void SetUp3DScene2(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scen
 	crateBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
 
 	crateBuffer->setTexture(crateTex);
-
 	crateObj->SetVertexBuffer(crateBuffer);
-
 	crateObj->SetPosition(glm::vec3(10.0f, 2.501f, -5.0f));
-
 	crateObj->CreateBoundingBox(5.0f, 5.0f, 5.0f);
-
-	auto crateHighlight = std::make_shared<HighlightBehavior>();
-	crateHighlight->SetObject(crateObj);
-
-	crateObj->AddBehavior("highlight", crateHighlight);
-
 	scene->AddObject(crateObj);
-
 	graphicsenvironment.AddObject("Crate", crateObj);
 
-	//Lab 10 Adding a textured cuboid in the south east corner of the plane 
-	std::shared_ptr<Texture> Marble = std::make_shared<Texture>();
-	std::shared_ptr<GraphicsObject> MarbleObj = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> MarbleBuffer = Generate::CuboidWithNormals(5.0f, 5.0f, 5.0f);
+	//cloud texture
+	std::shared_ptr<Texture> cloudTex = std::make_shared<Texture>();
+	cloudTex->LoadTextureDataFromFile("cloud.jpg");
 
-	Marble->LoadTextureDataFromFile("Marble.jpg");
+	//x-axis cloud buffer
+	std::shared_ptr<VertexBuffer> xCloudBuffer = Generate::CuboidWithNormals(10.0f, 2.0f, 5.0f);
+	xCloudBuffer->AddVertexAttribute("position", 0, 3, 0);
+	xCloudBuffer->AddVertexAttribute("color", 1, 4, 3);
+	xCloudBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	xCloudBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
 
+	xCloudBuffer->setTexture(cloudTex);
 
-	MarbleBuffer->AddVertexAttribute("position", 0, 3, 0);
-	MarbleBuffer->AddVertexAttribute("color", 1, 4, 3);
-	MarbleBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
-	MarbleBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
+	//z-axis cloud buffer
+	std::shared_ptr<VertexBuffer> zCloudBuffer = Generate::CuboidWithNormals(5.0f, 2.0f, 10.0f);
+	zCloudBuffer->AddVertexAttribute("position", 0, 3, 0);
+	zCloudBuffer->AddVertexAttribute("color", 1, 4, 3);
+	zCloudBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	zCloudBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
 
-	MarbleBuffer->setTexture(Marble);
+	zCloudBuffer->setTexture(cloudTex);
 
-	MarbleObj->SetVertexBuffer(MarbleBuffer);
+	//North
+	//First platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj1 = std::make_shared<GraphicsObject>();
+	cloudObj1->SetVertexBuffer(xCloudBuffer);
+	cloudObj1->SetPosition(glm::vec3(-5.0f, 2.50f, -35.0f));
+	cloudObj1->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj1);
+	graphicsenvironment.AddObject("Cloud1", cloudObj1);
+	//Second platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj2 = std::make_shared<GraphicsObject>();
+	cloudObj2->SetVertexBuffer(xCloudBuffer);
+	cloudObj2->SetPosition(glm::vec3(5.0f, 10.0f, -45.0f));
+	cloudObj2->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj2);
+	graphicsenvironment.AddObject("Cloud2", cloudObj2);
 
-	MarbleObj->SetPosition(glm::vec3(15.0f, 2.501f, 15.0f));
+	//Third platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj3 = std::make_shared<GraphicsObject>();
+	cloudObj3->SetVertexBuffer(xCloudBuffer);
+	cloudObj3->SetPosition(glm::vec3(10.0f, 15.0f, -40.0f));
+	cloudObj3->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj3);
+	graphicsenvironment.AddObject("Cloud3", cloudObj3);
 
-	MarbleObj->CreateBoundingBox(5.0f, 5.0f, 5.0f);
+	//Fourth platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj4 = std::make_shared<GraphicsObject>();
+	cloudObj4->SetVertexBuffer(xCloudBuffer);
+	cloudObj4->SetPosition(glm::vec3(20.0f, 5.0f, -55.0f));
+	cloudObj4->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj4);
+	graphicsenvironment.AddObject("Cloud4", cloudObj4);
 
-	auto MarbleHighlight = std::make_shared<HighlightBehavior>();
-	MarbleHighlight->SetObject(MarbleObj);
+	//Fifth platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj5 = std::make_shared<GraphicsObject>();
+	cloudObj5->SetVertexBuffer(xCloudBuffer);
+	cloudObj5->SetPosition(glm::vec3(30.0f, 10.0f, -50.0f));
+	cloudObj5->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj5);
+	graphicsenvironment.AddObject("Cloud5", cloudObj5);
 
-	MarbleObj->AddBehavior("highlight", MarbleHighlight);
+	//East
+	//Sixth platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj6 = std::make_shared<GraphicsObject>();
+	cloudObj6->SetVertexBuffer(zCloudBuffer);
+	cloudObj6->SetPosition(glm::vec3(40.0f, 15.0f, -35.0f));
+	cloudObj6->CreateBoundingBox(5.0f, 2.0f, 10.0f);
+	scene->AddObject(cloudObj6);
+	graphicsenvironment.AddObject("Cloud6", cloudObj6);
 
-	scene->AddObject(MarbleObj);
+	//Seventh platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj7 = std::make_shared<GraphicsObject>();
+	cloudObj7->SetVertexBuffer(zCloudBuffer);
+	cloudObj7->SetPosition(glm::vec3(45.0f, 5.0f, -15.0f));
+	cloudObj7->CreateBoundingBox(5.0f, 2.0f, 10.0f);
+	scene->AddObject(cloudObj7);
+	graphicsenvironment.AddObject("Cloud7", cloudObj7);
 
-	graphicsenvironment.AddObject("Marble", MarbleObj);
+	//Eight platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj8 = std::make_shared<GraphicsObject>();
+	cloudObj8->SetVertexBuffer(zCloudBuffer);
+	cloudObj8->SetPosition(glm::vec3(40.0f, 10.0f, -5.0f));
+	cloudObj8->CreateBoundingBox(5.0f, 2.0f, 10.0f);
+	scene->AddObject(cloudObj8);
+	graphicsenvironment.AddObject("Cloud8", cloudObj8);
 
+	//Ninth platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj9 = std::make_shared<GraphicsObject>();
+	cloudObj9->SetVertexBuffer(zCloudBuffer);
+	cloudObj9->SetPosition(glm::vec3(35.0f, 15.0f, 10.0f));
+	cloudObj9->CreateBoundingBox(5.0f, 2.0f, 10.0f);
+	scene->AddObject(cloudObj9);
+	graphicsenvironment.AddObject("Cloud9", cloudObj9);
 
-	//Lab 7 Adding Plane With Normals 
-	
-	std::shared_ptr<Texture> planeTex = std::make_shared<Texture>();
-	std::shared_ptr<GraphicsObject> plane = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> planeBuffer = Generate::XZPlaneWithNormals(30.0f, 30.0f);
+	//Tenth platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj10 = std::make_shared<GraphicsObject>();
+	cloudObj10->SetVertexBuffer(zCloudBuffer);
+	cloudObj10->SetPosition(glm::vec3(40.0f, 20.0f, 25.0f));
+	cloudObj10->CreateBoundingBox(5.0f, 2.0f, 10.0f);
+	scene->AddObject(cloudObj10);
+	graphicsenvironment.AddObject("Cloud10", cloudObj10);
 
-	planeTex->LoadTextureDataFromFile("cobblestone_floor_08_diff_1k.jpg");
+	//South
+	//11 platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj11 = std::make_shared<GraphicsObject>();
+	cloudObj11->SetVertexBuffer(xCloudBuffer);
+	cloudObj11->SetPosition(glm::vec3(30.0f, 20.0f, 30.0f));
+	cloudObj11->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj11);
+	graphicsenvironment.AddObject("Cloud11", cloudObj11);
 
-	planeBuffer->AddVertexAttribute("position", 0, 3, 0);
-	planeBuffer->AddVertexAttribute("color", 1, 4, 3);
-	planeBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
-	planeBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
+	//12 platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj12 = std::make_shared<GraphicsObject>();
+	cloudObj12->SetVertexBuffer(xCloudBuffer);
+	cloudObj12->SetPosition(glm::vec3(25.0f, 25.0f, 30.0f));
+	cloudObj12->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj12);
+	graphicsenvironment.AddObject("Cloud12", cloudObj12);
 
-	planeBuffer->setTexture(planeTex);
+	//13 platform cloud 
+	std::shared_ptr<GraphicsObject> cloudObj13 = std::make_shared<GraphicsObject>();
+	cloudObj13->SetVertexBuffer(xCloudBuffer);
+	cloudObj13->SetPosition(glm::vec3(15.0f, 25.0f, 35.0f));
+	cloudObj13->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj13);
+	graphicsenvironment.AddObject("Cloud13", cloudObj13);
 
-	plane->SetVertexBuffer(planeBuffer);
+	//14 platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj14 = std::make_shared<GraphicsObject>();
+	cloudObj14->SetVertexBuffer(xCloudBuffer);
+	cloudObj14->SetPosition(glm::vec3(0.0f, 30.0f, 30.0f));
+	cloudObj14->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj14);
+	graphicsenvironment.AddObject("Cloud14", cloudObj14);
 
-	plane->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+	//15 platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj15 = std::make_shared<GraphicsObject>();
+	cloudObj15->SetVertexBuffer(xCloudBuffer);
+	cloudObj15->SetPosition(glm::vec3(-15.0f, 35.0f, 30.0f));
+	cloudObj15->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj15);
+	graphicsenvironment.AddObject("Cloud15", cloudObj15);
 
-	scene->AddObject(plane);
+	//West
+	//16 platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj16 = std::make_shared<GraphicsObject>();
+	cloudObj16->SetVertexBuffer(zCloudBuffer);
+	cloudObj16->SetPosition(glm::vec3(-20.0f, 40.0f, 20.0f));
+	cloudObj16->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj16);
+	graphicsenvironment.AddObject("Cloud16", cloudObj16);
 
-	graphicsenvironment.AddObject("Plane", plane);
+	//17 platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj17 = std::make_shared<GraphicsObject>();
+	cloudObj17->SetVertexBuffer(zCloudBuffer);
+	cloudObj17->SetPosition(glm::vec3(-25.0f, 35.0f, 10.0f));
+	cloudObj17->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj17);
+	graphicsenvironment.AddObject("Cloud17", cloudObj17);
+
+	//18 platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj18 = std::make_shared<GraphicsObject>();
+	cloudObj18->SetVertexBuffer(zCloudBuffer);
+	cloudObj18->SetPosition(glm::vec3(-30.0f, 40.0f, 0.0f));
+	cloudObj18->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj18);
+	graphicsenvironment.AddObject("Cloud18", cloudObj18);
+
+	//19 platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj19 = std::make_shared<GraphicsObject>();
+	cloudObj19->SetVertexBuffer(zCloudBuffer);
+	cloudObj19->SetPosition(glm::vec3(-35.0f, 45.0f, -10.0f));
+	cloudObj19->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj19);
+	graphicsenvironment.AddObject("Cloud19", cloudObj19);
+
+	//20 platform cloud
+	std::shared_ptr<GraphicsObject> cloudObj20 = std::make_shared<GraphicsObject>();
+	cloudObj20->SetVertexBuffer(zCloudBuffer);
+	cloudObj20->SetPosition(glm::vec3(-25.0f, 50.0f, -15.0f));
+	cloudObj20->CreateBoundingBox(10.0f, 2.0f, 5.0f);
+	scene->AddObject(cloudObj20);
+	graphicsenvironment.AddObject("Cloud20", cloudObj20);
+
+	//Adding top platform 
+	std::shared_ptr<GraphicsObject> topPlane = std::make_shared<GraphicsObject>();
+	std::shared_ptr<VertexBuffer> topPlaneBuffer = Generate::XZPlaneWithNormals(30.0f, 30.0f);
+
+	topPlaneBuffer->AddVertexAttribute("position", 0, 3, 0);
+	topPlaneBuffer->AddVertexAttribute("color", 1, 4, 3);
+	topPlaneBuffer->AddVertexAttribute("vertexNormal", 2, 3, 7);
+	topPlaneBuffer->AddVertexAttribute("texCoord", 3, 2, 10);
+
+	topPlaneBuffer->setTexture(cloudTex);
+	topPlane->SetVertexBuffer(topPlaneBuffer);
+	topPlane->SetPosition(glm::vec3(0.0f, 60.0f, 0.0f));
+	topPlane->CreateBoundingBox(60.0f, 0.0f, 60.0f);
+	scene->AddObject(topPlane);
+	graphicsenvironment.AddObject("topPlane", topPlane);
 }
-
-//Lab 7 Part 3 
-
-void SetUpLightBulb(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
-{
-	//Read texture files and create a textureShader
-	TextFile vertextFile("texture.vert.glsl");
-	TextFile fragmentFile("texture.frag.glsl");
-	std::string vertexSource = vertextFile.GetData();
-	std::string fragmentSource = fragmentFile.GetData();
-	shader = std::make_shared<Shader>(vertexSource, fragmentSource);
-
-	//Add Unifroms
-	shader->AddUniform("projection");
-	shader->AddUniform("world");
-	shader->AddUniform("view");
-	shader->AddUniform("textUnit");
-
-	//Shared scene object
-	scene = std::make_shared<Scene>();
-
-	//Lab 7 Adding Lightbulb Object 
-
-	std::shared_ptr<Texture> LightbulbTex = std::make_shared<Texture>();
-	std::shared_ptr<GraphicsObject> LightbulbObj = std::make_shared<GraphicsObject>();
-	std::shared_ptr<VertexBuffer> LightbulbBuffer = Generate::XYPlane(1.0f, 1.0f);
-
-	LightbulbTex->LoadTextureDataFromFile("lightbulb.png");
-
-
-	LightbulbBuffer->AddVertexAttribute("position", 0, 3, 0);
-	LightbulbBuffer->AddVertexAttribute("color", 1, 3, 3);
-	LightbulbBuffer->AddVertexAttribute("texCoord", 2, 2, 6);
-
-	LightbulbBuffer->setTexture(LightbulbTex);
-
-	LightbulbObj->SetVertexBuffer(LightbulbBuffer);
-
-	LightbulbObj->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-
-	scene->AddObject(LightbulbObj);
-
-	graphicsenvironment.AddObject("Lightbulb", LightbulbObj);
-}
-
-//Lab 8 
-void SetUpPCObjectsScene(std::shared_ptr<Shader>& shader, std::shared_ptr<Scene>& scene, GraphicsEnvironment& graphicsenvironment)
-{
-	//Read texture files and create a textureShader
-	TextFile vertextFile("basic.vert.glsl");
-	TextFile fragmentFile("basic.frag.glsl");
-	std::string vertexSource = vertextFile.GetData();
-	std::string fragmentSource = fragmentFile.GetData();
-	shader = std::make_shared<Shader>(vertexSource, fragmentSource);
-
-	//Add Unifroms
-	shader->AddUniform("projection");
-	shader->AddUniform("world");
-	shader->AddUniform("view");
-
-	//Shared scene object
-	scene = std::make_shared<Scene>();
-
-	//Lab 8 Adding Circle Object 
-
-	std::shared_ptr<GraphicsObject> pcLinesCircle = std::make_shared<GraphicsObject>();
-	pcLinesCircle->CreateIndexBuffer();
-	pcLinesCircle->CreateVertexBuffer(6);
-	auto& CircleIndexBuffer = pcLinesCircle->GetIndexBuffer();
-	auto& CircleVertexBuffer = pcLinesCircle->GetVertexBuffer();
-	CircleVertexBuffer->SetPrimitiveType(GL_LINES);
-
-	Generate::XZLineCircle(CircleVertexBuffer, 3.0f);
-	Generate::LineCircleIndexes(CircleIndexBuffer, 36); //360/Steps 
-
-	CircleVertexBuffer->AddVertexAttribute("position", 0, 3, 0);
-	CircleVertexBuffer->AddVertexAttribute("color", 1, 3, 3);
-
-	pcLinesCircle->SetPosition(glm::vec3(0.0f, 1.0f, 7.0f));
-
-	scene->AddObject(pcLinesCircle);
-
-	graphicsenvironment.AddObject("circle", pcLinesCircle);
-
-	//Lab 8 Adding Line Cylinder 
-	std::shared_ptr<GraphicsObject> pcLinesCylinder = std::make_shared<GraphicsObject>();
-	pcLinesCylinder->CreateIndexBuffer();
-	pcLinesCylinder->CreateVertexBuffer(6);
-	auto& CylinderIndexBuffer = pcLinesCylinder->GetIndexBuffer();
-	auto& CylinderVertexBuffer = pcLinesCylinder->GetVertexBuffer();
-	CylinderVertexBuffer->SetPrimitiveType(GL_LINES);
-
-	Generate::LineCylinder(CylinderVertexBuffer, 3.0f, 5.0f);
-	Generate::LineCylinderIndexes(CylinderIndexBuffer, 36); //360/Steps 
-
-	CylinderVertexBuffer->AddVertexAttribute("position", 0, 3, 0);
-	CylinderVertexBuffer->AddVertexAttribute("color", 1, 3, 3);
-
-	pcLinesCylinder->SetPosition(glm::vec3(10.0f, 4.0f, 7.0f));
-
-	scene->AddObject(pcLinesCylinder);
-
-	graphicsenvironment.AddObject("cylinder", pcLinesCylinder);
-
-}
-
-
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -590,7 +353,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	glfw.Init(4, 3);
 
-	bool created = glfw.SetWindow(1200, 800, "ETSU Computing Interactive Graphics");
+	bool created = glfw.SetWindow(1920, 1080, "ETSU Computing Interactive Graphics");
 	if (created == false) return -1;
 
 	bool loaded = glfw.InitGlad();
@@ -598,38 +361,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	glfw.SetupGraphics();
 
-	////Lab 5 Part 2
-	//std::shared_ptr<Shader> shader;
-	//std::shared_ptr<Scene> scene;
-	////Lab 6
-	////SetUpScene1(shader, scene);
-	////SetUp3DScene1(shader, scene, glfw);
+	//Level 1
+	std::shared_ptr<Shader> level1shader;
+	std::shared_ptr<Scene> level1scene;
+	SetUpLevel1Scene(level1shader, level1scene, glfw);
 
-	//std::shared_ptr<Shader> textureShader;
-	//std::shared_ptr<Scene> textureScene;
-	////SetUpTexturedScene(textureShader, textureScene);
-
-	//Lab 7
-	std::shared_ptr<Shader> shader2;
-	std::shared_ptr<Scene> scene2;
-	SetUp3DScene2(shader2, scene2, glfw);
-
-	glfw.CreateRenderer("renderer", shader2);
-	glfw.GetRenderer("renderer")->SetScene(scene2);
+	glfw.CreateRenderer("level1renderer", level1shader);
+	glfw.GetRenderer("level1renderer")->SetScene(level1scene);
 	
 	//Lightbulb 
-	std::shared_ptr<Shader> lightbulbshader;
-	std::shared_ptr<Scene> lightbulbscene;
-	SetUpLightBulb(lightbulbshader, lightbulbscene, glfw);
-	glfw.CreateRenderer("lightbulbrenderer", lightbulbshader);
-	glfw.GetRenderer("lightbulbrenderer")->SetScene(lightbulbscene);
-
-	//Lab 8 Circle 
-	std::shared_ptr<Shader> circleshader;
-	std::shared_ptr<Scene> circlescene;
-	SetUpPCObjectsScene(circleshader, circlescene, glfw);
-	glfw.CreateRenderer("pcobjectrenderer", circleshader);
-	glfw.GetRenderer("pcobjectrenderer")->SetScene(circlescene);
+	std::shared_ptr<Shader> trophyshader;
+	std::shared_ptr<Scene> trophyscene;
+	SetUpTrophy(trophyshader, trophyscene, glfw);
+	glfw.CreateRenderer("trophyrenderer", trophyshader);
+	glfw.GetRenderer("trophyrenderer")->SetScene(trophyscene);
 
 	glfw.staticAllocate();
 

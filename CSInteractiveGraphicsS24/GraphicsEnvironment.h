@@ -17,10 +17,12 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<Renderer>> rendererMap;
 	std::shared_ptr<ObjectManager> objectManager;
 	std::shared_ptr<Camera> camera;
-	static GraphicsEnvironment* self; //Lab 6 Part 4
+	static GraphicsEnvironment* self;
 	MouseParams mouse; 
-	std::string isclicked = "empty";
 	Ray ray;
+	bool debugging = false; 
+	bool playerFall = true;
+	bool day = true;
 
 public: 
 	GraphicsEnvironment();
@@ -58,9 +60,15 @@ public:
 
 	static void OnMouseMove(GLFWwindow* window, double mouseX, double mouseY);
 
-	static void OnMouseClick(GLFWwindow* window, int button, int action, int mods);
+	static void OnButtonClick(GLFWwindow* window, int button, int action, int mods);
 
 	Ray GetMouseRay(const glm::mat4& projection, const glm::mat4& view);
+
+	void CheckCameraBox();
+
+	void Falling(double elapsedSeconds);
+
+	void Jump();
 };
 
 

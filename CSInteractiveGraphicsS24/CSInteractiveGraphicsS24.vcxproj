@@ -203,9 +203,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="base_grass_detail_S.png" />
+    <Image Include="cloud.jpg" />
     <Image Include="cobblestone_floor_08_diff_1k.jpg" />
     <Image Include="lightbulb.png" />
     <Image Include="Marble.jpg" />
+    <Image Include="Trophy-Icon.png" />
     <Image Include="Wooden Crate Texture.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -237,5 +237,11 @@
     <Image Include="Marble.jpg">
       <Filter>Resource Files\textures</Filter>
     </Image>
+    <Image Include="cloud.jpg">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+    <Image Include="Trophy-Icon.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>
