@@ -2,7 +2,7 @@
 
 During the 2024 winter semester at ETSU I developed a 3d graphics game from scratch using c++ and OpenGL with glfw
 
-##Summary of Game 
+## Summary of Game 
 
 This is a simple 3d platformer game. The goal of the player is the jump on a series of platform and claim the trophy object. 
 
