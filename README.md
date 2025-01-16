@@ -71,7 +71,7 @@ ObjectManager creates an unordered map of graphics objects and can return an obj
 
 ### Ray
 
-Ray creates an invisible ray giving aa start point and a direction. 
+Ray creates an invisible ray giving a start point and a direction. 
 
 ### Renderer
 
