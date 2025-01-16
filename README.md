@@ -14,7 +14,7 @@ Base object is the the base class for every object and gives all objects a logge
 
 ### Bounding Box
 
-A bounding box is simple put a gemetric shape (generally a cuboid since its a bounding box) that definnes the size and spacial location of another 3d object. Bounding boxes are commonly used for collision detection.
+A bounding box is simplu put a gemetric shape (generally a cuboid) that defines the size and spacial location of another 3d object. Bounding boxes are commonly used for collision detection.
 The Bounding Box class has implementations to determine if it's intersecting with a Ray, overlapping with another BoundingBox, or on top of another bounding box 
 
 ### Camera
